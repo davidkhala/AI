@@ -7,7 +7,7 @@ import requests
 class API(ABC):
     def __init__(self, api_key: str, base_url: str):
         self.api_key = api_key
-        self.base_url = base_url
+        self.base_url = base_url+'/v1'
         self.model = None
 
     @property
@@ -39,7 +39,7 @@ class API(ABC):
         }
         self.pre_request(headers, json)
         # timeout=50 to cater siliconflow
-        response = requests.post(f"{self.base_url}/v1/chat/completions", headers=headers, json=json, timeout=50)
+        response = requests.post(f"{self.base_url}/chat/completions", headers=headers, json=json, timeout=50)
         parsed_response = response.json()
 
 
