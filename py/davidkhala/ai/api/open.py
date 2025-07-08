@@ -1,12 +1,14 @@
-import requests
-
 from davidkhala.ai.api import API
 
 
 class OpenRouter(API):
     @property
     def free_models(self) -> list[str]:
-        return list(filter(lambda model:model.endswith(':free'), self.list_models()))
+        return list(
+            map(lambda model: model['id'],
+                filter(lambda model: model['id'].endswith(':free'), self.list_models())
+                )
+        )
 
     def __init__(self, api_key: str, models: list[str] = None, *,
                  leaderboard: dict = None):
@@ -25,6 +27,3 @@ class OpenRouter(API):
             data["models"] = self.models
         else:
             data["model"] = self.models[0]
-    def list_models(self):
-        response = requests.get(f"{self.base_url}/models").json()
-        return list(map(lambda model:model['id'], response['data']))
