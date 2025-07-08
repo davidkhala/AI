@@ -5,7 +5,7 @@ from davidkhala.ai.api.open import OpenRouter
 
 
 class APITestCase(unittest.TestCase):
-    def test_prompt(self):
+    def test_chat(self):
         api_key = os.environ.get('API_KEY')
         openrouter = OpenRouter(api_key)
         r = openrouter.chat('who am I?')

@@ -10,12 +10,14 @@ class API(ABC):
         self.base_url = base_url
         self.model = None
 
+    @property
+    @abstractmethod
+    def free_models(self)->list[str]:
+        ...
+
     @abstractmethod
     def pre_request(self, headers: dict, data: dict):
         data["model"] = self.model
-
-
-
     def chat(self, prompt, system_prompt: str = None):
         headers = {
             "Authorization": f"Bearer {self.api_key}",
@@ -36,18 +38,22 @@ class API(ABC):
             "messages": messages
         }
         self.pre_request(headers, json)
-
-        response = requests.post(f"{self.base_url}/v1/chat/completions", headers=headers, json=json).json()
-        err = response.get('error')
-        if err is not None:
-            raise Exception(err)
+        # timeout=50 to cater siliconflow
+        response = requests.post(f"{self.base_url}/v1/chat/completions", headers=headers, json=json, timeout=50)
+        parsed_response = response.json()
 
 
+        match parsed_response:
+            case dict():
+                err = parsed_response.get('error')
+                if err is not None:
+                    raise Exception(err)
+            case str():
+                raise Exception(parsed_response)
         return {
-            "data": list(map(lambda x: x['message']['content'], response['choices'])),
+            "data": list(map(lambda x: x['message']['content'], parsed_response['choices'])),
             "meta": {
-                "provider": response["provider"],
-                "usage": response['usage'],
-                "created": datetime.datetime.fromtimestamp(response['created'])
+                "usage": parsed_response['usage'],
+                "created": datetime.datetime.fromtimestamp(parsed_response['created'])
             }
         }
