@@ -4,13 +4,22 @@ version = "0.0.0"
 description = "misc AI modules"
 readme = "README.md"
 requires-python = ">=3.12"
+dependencies = [
+    "opik",
+]
 
 [project.optional-dependencies]
 langchain = [
     "langgraph" # TODO
 ]
+google = [
+    "google-genai", "google-adk"
+]
 api = [
-    "requests"
+    "requests",
+]
+openai = [
+    "openai"
 ]
 [tool.hatch.build.targets.sdist]
 include = ["davidkhala"]
