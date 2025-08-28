@@ -4,13 +4,13 @@ version = "0.0.0"
 description = "misc AI modules"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = [
-    "requests>=2.32.4",
-]
 
 [project.optional-dependencies]
-google = [
-    "google-adk",
+langchain = [
+    "langgraph" # TODO
+]
+api = [
+    "requests"
 ]
 [tool.hatch.build.targets.sdist]
 include = ["davidkhala"]

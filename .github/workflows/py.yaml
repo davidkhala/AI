@@ -16,3 +16,4 @@ jobs:
           working-directory: py
           test-entry-point: pytest ${{matrix.provider}}_test.py
           tests: py/tests
+          extras: api
