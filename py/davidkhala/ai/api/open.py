@@ -1,5 +1,11 @@
+from typing import TypedDict, Optional
+
 from davidkhala.ai.api import API
 
+
+class Leaderboard(TypedDict):
+    url:Optional[str]
+    name:Optional[str]
 
 class OpenRouter(API):
     @property
@@ -11,7 +17,7 @@ class OpenRouter(API):
         )
 
     def __init__(self, api_key: str, models: list[str] = None, *,
-                 leaderboard: dict = None):
+                 leaderboard: Leaderboard = None):
 
         super().__init__(api_key, 'https://openrouter.ai/api')
         self.leaderboard = leaderboard

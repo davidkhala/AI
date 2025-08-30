@@ -10,7 +10,8 @@ dependencies = [
 
 [project.optional-dependencies]
 langchain = [
-    "langgraph" # TODO
+    "langgraph", "langchain",
+    "langchain-openai" # required by openRouter
 ]
 google = [
     "google-genai", "google-adk"
@@ -33,5 +34,6 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
-    "pytest>=8.4.1",
+    "pytest",
+
 ]
