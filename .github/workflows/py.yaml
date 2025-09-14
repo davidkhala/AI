@@ -5,9 +5,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        provider: [openrouter, siliconflow]
+        provider: [openrouter, siliconflow, azure]
     environment: ${{matrix.provider}}
     env:
+      PROJECT: ${{vars.PROJECT}}
       API_KEY: ${{secrets.API_KEY}}
     steps:
       - uses: actions/checkout@main
