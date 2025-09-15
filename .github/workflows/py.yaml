@@ -10,6 +10,10 @@ jobs:
     env:
       PROJECT: ${{vars.PROJECT}}
       API_KEY: ${{secrets.API_KEY}}
+      DEPLOYMENT: ${{vars.DEPLOYMENT}}
+      DEPLOYMENT_MODEL: ${{vars.DEPLOYMENT_MODEL}}
+      DEPLOYMENT_KEY: ${{secrets.DEPLOYMENT_KEY}}
+
     steps:
       - uses: actions/checkout@main
       - uses: davidkhala/uv-buildpack@main
