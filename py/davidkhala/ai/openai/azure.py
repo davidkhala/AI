@@ -7,7 +7,6 @@ from davidkhala.ai.openai import Client
 
 class ModelDeploymentClient(Client):
     def __init__(self, key, deployment):
-        # format applied to region: southeastasia
         self.client = AzureOpenAI(
             api_version="2024-12-01-preview",  # mandatory
             azure_endpoint=f"https://{deployment}.cognitiveservices.azure.com/",

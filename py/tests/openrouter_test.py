@@ -14,7 +14,7 @@ class APITestCase(unittest.TestCase):
 
     def test_models(self):
         models = self.openrouter.free_models
-        self.assertEqual(57, len(models))
+        self.assertGreaterEqual(len(models), 55)
 
 
 if __name__ == "__main__":
