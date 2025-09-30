@@ -1,11 +1,7 @@
 [wiki](https://github.com/davidkhala/AI/wiki/LangGenius#dify)
 
 
-# Dify app
-## type: completion
-- 只进行一次问答：没有system prompt
-- 支持多模型并发，适合用于模型对比评估
-
+# [Studio](./app)
 
 
 # Knowledge

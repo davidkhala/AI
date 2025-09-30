@@ -1,8 +1,5 @@
 [Dify marketplace](https://marketplace.dify.ai/)
 - a dev tool landscape
-
-# [data analysis](https://marketplace.dify.ai/plugins/digitforce/data_analysis)
-powered by https://ada.im
-
-# [database](https://marketplace.dify.ai/plugins/hjlarry/database)
-[source](https://github.com/hjlarry/dify-plugin-database)
+- [official releases](https://marketplace.dify.ai/?q=langgenius)
+- [catalog:studio](./app/marketplace.md)
+- [catalog:knowledge pipeline](./knowledge/marketplace.md)
