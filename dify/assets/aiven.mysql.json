@@ -1,0 +1,9 @@
+{
+  "DB_TYPE": "MySQL",
+  "HOST": "free-davidkhala.k.aivencloud.com",
+  "PORT": 22013,
+  "USERNAME": "avnadmin",
+  "PASSWORD": "**********",
+  "DATABASE": "defaultdb",
+  "TABLE_NAMES": ""
+}

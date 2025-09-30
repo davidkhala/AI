@@ -10,7 +10,7 @@ cp .env.example .env
 docker compose up -d
 ```
 
-hardware resource comsumed
+hardware resource consumed
 - 6 CPU
 - 2 GB memory
 - 6.5 GB container image 
