@@ -1,0 +1,7 @@
+{
+  "host": "free-davidkhala.k.aivencloud.com",
+  "port": 22013,
+  "user": "avnadmin",
+  "password": "**********",
+  "db_name": "defaultdb",
+}
