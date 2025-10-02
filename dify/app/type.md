@@ -8,6 +8,15 @@ Start Node
 # type: Chatflow
 >　workflow enhanced for multi-turn chats
 
+## Variable Assigner Node
+> used to assign values to writable variables
+
+writable variables is one of [conversation variables]
+
+### conversation variables
+defined by top-right corner
+![conversation variables](conversation-var.png)
+
 # basic type: Chatbot
 >　LLM-based chatbot with simple setup
 # basic type: Agent

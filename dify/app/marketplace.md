@@ -11,7 +11,8 @@ powered by https://ada.im
 > write the database metadata into the Dify knowledge
 [source](https://github.com/majinkai/dify-database-to-knowledge)
 
-- only support as individual Node in app type=Workflow|Chatflow
+- only support as individual Node in app type=`Workflow` or `Chatflow`
+- cannot support [Knowledge Pipeline] 
 
 # Disqualified
 HelloDB
