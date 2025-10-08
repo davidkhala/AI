@@ -10,20 +10,16 @@ class Client(AbstractClient):
     client: OpenAI
     encoding_format: Literal["float", "base64"] = "float"
 
-    def as_embeddings(self, model):
-        self.model = model
-
-
     def connect(self):
         self.client.models.list()
 
-    def encode(self, _input: str)-> List[float]:
+    def encode(self, *_input: str) -> List[List[float]]:
         response = self.client.embeddings.create(
             model=self.model,
-            input=_input,
+            input=list(_input),
             encoding_format=self.encoding_format
         )
-        return response.data[0].embedding
+        return [item.embedding for item in response.data]
 
     def chat(self, user_prompt, image: str = None):
 

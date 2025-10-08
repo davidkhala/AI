@@ -17,7 +17,7 @@ class GetStartedTestCase(unittest.TestCase):
             """Get weather for a given city."""
             return f"It's always sunny in {city}!"
 
-        free_model = "mistralai/mistral-small-3.2-24b-instruct:free" # chosen by https://openrouter.ai/models?supported_parameters=tools&max_price=0
+        free_model = "x-ai/grok-code-fast-1" # chosen by https://openrouter.ai/models?supported_parameters=tools
         model = OpenRouterModel(api_key).init_chat_model(free_model)
         agent = Agent(
             model,
