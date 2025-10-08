@@ -17,19 +17,21 @@ class GetStartedTestCase(unittest.TestCase):
             """Get weather for a given city."""
             return f"It's always sunny in {city}!"
 
-        model = OpenRouterModel(api_key).init_chat_model("deepseek/deepseek-chat-v3.1:free")
+        free_model = "mistralai/mistral-small-3.2-24b-instruct:free" # chosen by https://openrouter.ai/models?supported_parameters=tools&max_price=0
+        model = OpenRouterModel(api_key).init_chat_model(free_model)
         agent = Agent(
             model,
             "You are a helpful assistant",
             get_weather
         )
-        r: AIMessage = agent.invoke("what is the weather in Hongkong")
-        print(r.content)
+        r = agent.invoke("what is the weather in Hongkong")
+
+        print(r) # TODO no actual response found
 
 
 class ModelTestCase(unittest.TestCase):
     def test_openrouter(self):
-        model = OpenRouterModel(api_key).init_chat_model("deepseek/deepseek-chat-v3.1:free")
+        model = OpenRouterModel(api_key).init_chat_model("openai/gpt-oss-20b:free")
         r: AIMessage = model.invoke("what is the weather in sf")
         print(r.content)
 
