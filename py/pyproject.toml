@@ -3,9 +3,9 @@ name = "davidkhala.ai"
 version = "0.0.1"
 description = "misc AI modules"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = "==3.13.*"
 dependencies = [
-    "opik",
+    "opik", # limit py version:　PyO3 v0.22.6 currently supports up to Python 3.13.
 ]
 
 [project.optional-dependencies]
@@ -18,6 +18,9 @@ google = [
 ]
 api = [
     "requests",
+]
+ali = [
+    "dashscope"
 ]
 openai = [
     "openai"

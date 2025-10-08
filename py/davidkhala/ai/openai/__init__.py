@@ -1,33 +1,27 @@
 import runpy
-from abc import ABC
-from typing import Union, Optional, Literal, List
+from typing import Union, Literal, List
 
 from openai import OpenAI, AsyncOpenAI
 
+from davidkhala.ai.model import AbstractClient
 
-class Client(ABC):
-    api_key: str
-    base_url: str
-    model: Optional[str]
-    messages = []
+
+class Client(AbstractClient):
     client: OpenAI
+    encoding_format: Literal["float", "base64"] = "float"
 
-    def as_chat(self, model, sys_prompt: str = None):
+    def as_embeddings(self, model):
         self.model = model
-        if sys_prompt is not None:
-            self.messages = [{"role": "system", "content": sys_prompt}]
 
-    def as_embeddings(self, model, encoding_format: str = "float"):
-        self.model = model
 
     def connect(self):
         self.client.models.list()
 
-    def encode(self, _input: str, _format: Literal["float", "base64"] = "float")-> List[float]:
+    def encode(self, _input: str)-> List[float]:
         response = self.client.embeddings.create(
             model=self.model,
             input=_input,
-            encoding_format=_format
+            encoding_format=self.encoding_format
         )
         return response.data[0].embedding
 
