@@ -11,7 +11,6 @@ class APITestCase(unittest.TestCase):
     def test_chat(self):
         r = self.openrouter.chat('who am I?')
         print(r)
-
     def test_models(self):
         models = self.openrouter.free_models
         self.assertGreaterEqual(len(models), 51)

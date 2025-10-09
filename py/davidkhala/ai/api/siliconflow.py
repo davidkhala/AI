@@ -35,5 +35,3 @@ class SiliconFlow(API):
     def __init__(self, api_key: str, model: str):
         super().__init__(api_key, 'https://api.siliconflow.cn')
         self.model = model
-    def pre_request(self, headers: dict, data: dict):
-        super().pre_request(headers, data)

@@ -3,7 +3,7 @@ from abc import abstractmethod, ABC
 
 import requests
 
-
+# TODO Think openrouter as exceptional case
 class API(ABC):
     def __init__(self, api_key: str, base_url: str):
         self.base_url = base_url+'/v1'
@@ -16,7 +16,6 @@ class API(ABC):
     def free_models(self)->list[str]:
         ...
 
-    @abstractmethod
     def pre_request(self, headers: dict, data: dict):
         data["model"] = self.model
     def chat(self, prompt, system_prompt: str = None):

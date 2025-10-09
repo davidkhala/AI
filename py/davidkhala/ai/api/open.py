@@ -24,7 +24,7 @@ class OpenRouter(API):
         if models is None:
             models = [self.free_models[0]]
         self.models = models
-
+    # TODO Hard to multi-model supports here
     def pre_request(self, headers: dict, data: dict):
         if self.leaderboard is not None:
             headers["HTTP-Referer"] = self.leaderboard['url'],  # Optional. Site URL for rankings on openrouter.ai.
