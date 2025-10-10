@@ -19,7 +19,7 @@ api = [
 ali = [
     "dashscope"
 ]
-openai = [
+azure = [
     "openai"
 ]
 telemetry =[

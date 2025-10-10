@@ -5,13 +5,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        provider: [openrouter, siliconflow, azure]
+        provider: [openrouter, siliconflow]
     environment: ${{matrix.provider}}
     env:
-      PROJECT: ${{vars.PROJECT}}
       API_KEY: ${{secrets.API_KEY}}
-      DEPLOYMENT: ${{vars.DEPLOYMENT}}
-      DEPLOYMENT_KEY: ${{secrets.DEPLOYMENT_KEY}}
 
     steps:
       - uses: actions/checkout@main
@@ -21,6 +18,22 @@ jobs:
           test-entry-point: pytest ${{matrix.provider}}_test.py
           tests: py/tests
           extras: api
+  azure:
+    runs-on: ubuntu-latest
+    environment: azure
+    env:
+      PROJECT: ${{vars.PROJECT}}
+      API_KEY: ${{secrets.API_KEY}}
+      DEPLOYMENT: ${{vars.DEPLOYMENT}}
+      DEPLOYMENT_KEY: ${{secrets.DEPLOYMENT_KEY}}
+    steps:
+      - uses: actions/checkout@main
+      - uses: davidkhala/uv-buildpack@main
+        with:
+          working-directory: py
+          test-entry-point: pytest azure_test.py
+          tests: py/tests
+          extras: azure
   langgraph:
     runs-on: ubuntu-latest
     environment: openrouter
