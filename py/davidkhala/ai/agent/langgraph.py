@@ -1,7 +1,7 @@
 from langchain_openai import ChatOpenAI
 from langgraph.prebuilt import create_react_agent
 
-from davidkhala.ai.api.open import Leaderboard
+from davidkhala.ai.api.openrouter import Leaderboard
 
 
 class Agent:

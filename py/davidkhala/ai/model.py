@@ -16,7 +16,7 @@ class AbstractClient(ABC):
     def as_embeddings(self, model: str):
         self.model = model
 
-    def chat(self, user_prompt: str, **kwargs):
+    def chat(self, *user_prompt, **kwargs):
         ...
 
     def encode(self, *_input: str) -> List[List[float]]:
