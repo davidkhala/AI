@@ -6,10 +6,11 @@ from davidkhala.ai.api.siliconflow import SiliconFlow
 
 class APITestCase(unittest.TestCase):
     api_key = os.environ.get('API_KEY')
-    _ = SiliconFlow(api_key, None)
+    _ = SiliconFlow(api_key)
 
     def test_chat(self):
-        self._.model = 'deepseek-ai/DeepSeek-R1-0528-Qwen3-8B'
+        self._.as_chat('deepseek-ai/DeepSeek-R1-0528-Qwen3-8B')
+
         r = self._.chat('who am I?')
         print(r)
 

@@ -14,7 +14,7 @@ google = [
     "google-genai", "google-adk"
 ]
 api = [
-    "requests",
+    "davidkhala.utils[http_request]",
 ]
 ali = [
     "dashscope"
