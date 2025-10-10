@@ -1,8 +1,6 @@
 from langchain_openai import ChatOpenAI
 from langgraph.prebuilt import create_react_agent
 
-from davidkhala.ai.api.openrouter import Leaderboard
-
 
 class Agent:
 
@@ -18,10 +16,10 @@ class Agent:
 
 
 class OpenRouterModel:
-    def __init__(self, api_key, leaderboard: Leaderboard = None):
+    def __init__(self, api_key, leaderboard: dict = None):
         self.api_key = api_key
 
-        if leaderboard is not None:
+        if leaderboard:
             self.headers = {
                 "HTTP-Referer": leaderboard['url'],
                 "X-Title": leaderboard['name'],

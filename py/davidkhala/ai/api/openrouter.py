@@ -1,16 +1,8 @@
-from typing import TypedDict, Optional
-
 import requests
 from davidkhala.http_request import default_on_response
 from requests import HTTPError, Response
 
 from davidkhala.ai.api import API
-
-
-class Leaderboard(TypedDict):
-    url: Optional[str]
-    name: Optional[str]
-
 
 class OpenRouter(API):
     @property
@@ -30,7 +22,9 @@ class OpenRouter(API):
             derived_response = Response()
             derived_response.status_code = err.pop('code', None)
             derived_response._content = err.pop('message', None)
-            raise HTTPError(response=derived_response, **err)
+            http_err =  HTTPError(response=derived_response)
+            http_err.metadata = err.get("metadata")
+            raise http_err
         return r
 
     def __init__(self, api_key: str, *models: str, **kwargs):
