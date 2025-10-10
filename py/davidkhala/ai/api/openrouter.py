@@ -1,3 +1,5 @@
+import time
+
 import requests
 from davidkhala.http_request import default_on_response
 from requests import Response
@@ -47,7 +49,13 @@ class OpenRouter(API):
         else:
             kwargs["model"] = self.model
 
-        r = super().chat(*user_prompt, **kwargs)
+        try:
+            r = super().chat(*user_prompt, **kwargs)
+        except requests.HTTPError as e:
+            if e.response.status_code == 429 and kwargs.get('retry'):
+                time.sleep(1)
+                return self.chat(*user_prompt, **kwargs)
+            else: raise
         if self.models:
             assert r['model'] in self.models
         return r
