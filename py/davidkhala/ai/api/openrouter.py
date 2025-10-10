@@ -1,8 +1,9 @@
 import requests
 from davidkhala.http_request import default_on_response
-from requests import HTTPError, Response
+from requests import Response
 
 from davidkhala.ai.api import API
+
 
 class OpenRouter(API):
     @property
@@ -20,11 +21,11 @@ class OpenRouter(API):
         err = r.get('error')
         if err:
             derived_response = Response()
-            derived_response.status_code = err.pop('code', None)
-            derived_response._content = err.pop('message', None)
-            http_err =  HTTPError(response=derived_response)
-            http_err.metadata = err.get("metadata")
-            raise http_err
+            derived_response.status_code = err['code']
+            derived_response.reason = err['message']
+            derived_response.metadata = err.get("metadata")
+
+            derived_response.raise_for_status()
         return r
 
     def __init__(self, api_key: str, *models: str, **kwargs):
@@ -36,16 +37,17 @@ class OpenRouter(API):
                 'url']  # Site URL for rankings on openrouter.ai.
             self._.options["headers"]["X-Title"] = kwargs['leaderboard'][
                 'name']  # Site title for rankings on openrouter.ai.
-        if not models:
-            models = [self.free_models[0]]
         self.models = models
 
         self._.on_response = OpenRouter.on_response
 
     def chat(self, *user_prompt: str, **kwargs):
-        if len(self.models) > 1:
+        if self.models:
             kwargs["models"] = self.models
         else:
-            kwargs["model"] = self.models[0]
+            kwargs["model"] = self.model
 
-        return super().chat(*user_prompt, **kwargs)
+        r = super().chat(*user_prompt, **kwargs)
+        if self.models:
+            assert r['model'] in self.models
+        return r

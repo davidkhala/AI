@@ -38,7 +38,8 @@ class API(AbstractClient):
             "meta": {
                 "usage": response['usage'],
                 "created": datetime.datetime.fromtimestamp(response['created'])
-            }
+            },
+            'model': response['model'],
         }
 
     def list_models(self):
