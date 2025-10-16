@@ -1,7 +1,7 @@
 import time
 
 import requests
-from davidkhala.http_request import default_on_response
+from davidkhala.utils.http_request import default_on_response
 from requests import Response
 
 from davidkhala.ai.api import API

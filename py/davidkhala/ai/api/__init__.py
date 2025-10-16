@@ -1,7 +1,7 @@
 import datetime
 from abc import abstractmethod
 
-from davidkhala.http_request import Request
+from davidkhala.utils.http_request import Request
 
 from davidkhala.ai.model import AbstractClient
 
