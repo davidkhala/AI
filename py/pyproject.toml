@@ -12,7 +12,10 @@ langchain = [
 ]
 google = ["google-genai", "google-adk"]
 api = ["davidkhala.utils[http_request]"]
-hf = ["huggingface_hub", 'hf_xet']
+hf = [
+    "huggingface_hub", 'hf_xet',
+    'onnxruntime','onnx' # for test only
+]
 ali = ["dashscope"]
 azure = ["openai"]
 telemetry = [
@@ -30,5 +33,5 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
-    "pytest",
+    "pytest"
 ]
