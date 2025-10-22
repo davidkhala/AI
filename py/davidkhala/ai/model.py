@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Optional, List
+from typing import Optional
 
 
 class AbstractClient(ABC):
@@ -19,7 +19,7 @@ class AbstractClient(ABC):
     def chat(self, *user_prompt, **kwargs):
         ...
 
-    def encode(self, *_input: str) -> List[List[float]]:
+    def encode(self, *_input: str) -> list[list[float]]:
         ...
     def connect(self):
         ...

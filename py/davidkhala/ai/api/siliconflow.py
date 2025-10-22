@@ -34,7 +34,16 @@ class SiliconFlow(API):
 
     def __init__(self, api_key: str):
         super().__init__(api_key, 'https://api.siliconflow.cn')
-        self._.options['timeout'] = 50
+        self.options['timeout'] = 50
+
     def chat(self, *user_prompt: str, **kwargs):
         kwargs['model'] = self.model
         return super().chat(*user_prompt, **kwargs)
+
+    def encode(self, *_input: str) -> list[list[float]]:
+        json = {
+            'input': _input,
+            'model': self.model
+        }
+        response = self.request(f"{self.base_url}/embeddings", "POST", json=json)
+        return [_['embedding'] for _ in response['data']]

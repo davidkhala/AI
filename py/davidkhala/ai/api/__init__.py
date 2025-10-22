@@ -1,6 +1,5 @@
 import datetime
 from abc import abstractmethod
-from typing import List
 
 from davidkhala.utils.http_request import Request
 
@@ -47,16 +46,3 @@ class API(AbstractClient, Request):
     def list_models(self):
         response = self.request(f"{self.base_url}/models", "GET")
         return response['data']
-
-
-    def encode(self, *_input: str) -> List[List[float]]:
-        """
-        TODO from siliconflow only
-        :param _input:
-        :return:
-        """
-        json = {
-            'input'
-        }
-        response =self.request(f"{self.base_url}/embeddings", "POST", json=json)
-        return [ _['embedding'] for _ in response['data']]

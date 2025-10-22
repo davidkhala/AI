@@ -1,5 +1,5 @@
 import runpy
-from typing import Union, Literal, List
+from typing import Union, Literal
 
 from openai import OpenAI, AsyncOpenAI
 
@@ -14,7 +14,7 @@ class Client(AbstractClient):
     def connect(self):
         self.client.models.list()
 
-    def encode(self, *_input: str) -> List[List[float]]:
+    def encode(self, *_input: str) -> list[list[float]]:
         response = self.client.embeddings.create(
             model=self.model,
             input=list(_input),

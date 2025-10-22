@@ -42,6 +42,17 @@ class OpenRouter(API):
         self.models = models
 
         self.on_response = OpenRouter.on_response
+        self.retry = True
+
+    def request(self, url, method: str, params=None, data=None, json=None) -> dict:
+        try:
+            return super().request(url, method, params, data, json)
+        except requests.HTTPError as e:
+            if e.response.status_code == 429 and self.retry:  # 429: You are being rate limited
+                time.sleep(1)
+                return self.request(url, method, params, data, json)
+            else:
+                raise
 
     def chat(self, *user_prompt: str, **kwargs):
         if self.models:
@@ -49,13 +60,8 @@ class OpenRouter(API):
         else:
             kwargs["model"] = self.model
 
-        try:
-            r = super().chat(*user_prompt, **kwargs)
-        except requests.HTTPError as e:
-            if e.response.status_code == 429 and kwargs.get('retry'):
-                time.sleep(1)# TODO move it to retry
-                return self.chat(*user_prompt, **kwargs)
-            else: raise
+        r = super().chat(*user_prompt, **kwargs)
+
         if self.models:
             assert r['model'] in self.models
         return r

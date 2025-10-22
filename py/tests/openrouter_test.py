@@ -14,7 +14,6 @@ class APITestCase(unittest.TestCase):
     def test_chat(self):
         self.openrouter.as_chat("deepseek/deepseek-chat-v3.1:free")
         r = self.openrouter.chat('who am I?')
-        print(r)
         self.assertTrue(type(r['data']) == list)
         self.assertEqual(1, len(r['data']))
 

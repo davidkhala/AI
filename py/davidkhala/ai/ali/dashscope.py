@@ -1,10 +1,9 @@
 from enum import Enum
 from http import HTTPStatus
-from typing import List
 
-from dashscope import Generation, TextEmbedding
 from dashscope.api_entities.dashscope_response import DashScopeAPIResponse
 
+from dashscope import Generation, TextEmbedding
 from davidkhala.ai.model import AbstractClient
 
 
@@ -58,7 +57,7 @@ class API(AbstractClient):
         )
         return API._on_response(r)
 
-    def encode(self, *_input: str)-> List[List[float]]:
+    def encode(self, *_input: str)-> list[list[float]]:
         r= TextEmbedding.call(
             self.model,list(_input),
             api_key= self.api_key,

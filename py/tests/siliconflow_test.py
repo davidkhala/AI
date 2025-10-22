@@ -1,4 +1,5 @@
 import os
+import time
 import unittest
 
 from davidkhala.ai.api.siliconflow import SiliconFlow
@@ -18,7 +19,13 @@ class ChatTestCase(unittest.TestCase):
         r = _.chat('who am I?')
         print(r)
 class EmbeddingTestCase(unittest.TestCase):
-    ...
+    def test_array(self):
+        _.as_embeddings('BAAI/bge-m3')
+        start_time = time.time()
+        r = _.encode("abc--------------------------------", "edf-----------------")
+        print(time.time() - start_time)
+        self.assertEqual(2, len(r))
+
 
 
 
