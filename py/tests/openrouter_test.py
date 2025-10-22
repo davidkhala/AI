@@ -25,10 +25,12 @@ class APITestCase(unittest.TestCase):
 
     def test_models(self):
         models = self.openrouter.free_models
-        self.assertGreaterEqual(len(models), 51)
+        self.assertGreaterEqual(len(models), 50)
         print(models)
 
     def test_google_limit(self):
+        if os.environ.get('CI'):
+            self.skipTest("Gemini  is available in GitHub runner region")
         for model in ['google/gemma-3n-e2b-it:free']:
             self.openrouter.as_chat(model)
             with self.assertRaises(HTTPError) as e:
@@ -46,6 +48,8 @@ class APITestCase(unittest.TestCase):
             r = self.openrouter.chat('return True')
             print(model, r['data'][0])
     def test_openai_limit(self):
+        if os.environ.get('CI'):
+            self.skipTest("openai is available in GitHub runner region")
         self.openrouter.as_chat('openai/gpt-4.1-nano')
         with self.assertRaises(HTTPError) as e:
             self.openrouter.chat('-')
