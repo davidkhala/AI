@@ -3,7 +3,7 @@ import time
 import unittest
 
 from davidkhala.ai.api.siliconflow import SiliconFlow
-
+from requests import HTTPError
 
 api_key = os.environ.get('API_KEY')
 _ = SiliconFlow(api_key)
@@ -25,7 +25,11 @@ class EmbeddingTestCase(unittest.TestCase):
         r = _.encode("abc--------------------------------", "edf-----------------")
         print(time.time() - start_time)
         self.assertEqual(2, len(r))
-
+    def test_empty(self):
+        _.as_embeddings('BAAI/bge-m3')
+        with self.assertRaises(HTTPError) as e:
+            r = _.encode("")
+        self.assertEqual(400, e.exception.response.status_code )
 
 
 
