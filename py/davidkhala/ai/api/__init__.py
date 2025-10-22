@@ -1,16 +1,18 @@
 import datetime
 from abc import abstractmethod
+from typing import List
 
 from davidkhala.utils.http_request import Request
 
 from davidkhala.ai.model import AbstractClient
 
 
-class API(AbstractClient):
+class API(AbstractClient, Request):
     def __init__(self, api_key: str, base_url: str):
-        self.api_key = api_key
+        super().__init__({
+            "bearer": api_key
+        })
         self.base_url = base_url + '/v1'
-        self._ = Request({"bearer": api_key})
 
     @property
     @abstractmethod
@@ -31,7 +33,7 @@ class API(AbstractClient):
             **kwargs,
         }
 
-        response = self._.request(f"{self.base_url}/chat/completions", "POST", json=json)
+        response = self.request(f"{self.base_url}/chat/completions", "POST", json=json)
 
         return {
             "data": list(map(lambda x: x['message']['content'], response['choices'])),
@@ -43,5 +45,18 @@ class API(AbstractClient):
         }
 
     def list_models(self):
-        response = self._.request(f"{self.base_url}/models", "GET")
+        response = self.request(f"{self.base_url}/models", "GET")
         return response['data']
+
+
+    def encode(self, *_input: str) -> List[List[float]]:
+        """
+        TODO from siliconflow only
+        :param _input:
+        :return:
+        """
+        json = {
+            'input'
+        }
+        response =self.request(f"{self.base_url}/embeddings", "POST", json=json)
+        return [ _['embedding'] for _ in response['data']]

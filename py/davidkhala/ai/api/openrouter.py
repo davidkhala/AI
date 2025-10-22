@@ -35,13 +35,13 @@ class OpenRouter(API):
         super().__init__(api_key, 'https://openrouter.ai/api')
 
         if 'leaderboard' in kwargs and type(kwargs['leaderboard']) is dict:
-            self._.options["headers"]["HTTP-Referer"] = kwargs['leaderboard'][
+            self.options["headers"]["HTTP-Referer"] = kwargs['leaderboard'][
                 'url']  # Site URL for rankings on openrouter.ai.
-            self._.options["headers"]["X-Title"] = kwargs['leaderboard'][
+            self.options["headers"]["X-Title"] = kwargs['leaderboard'][
                 'name']  # Site title for rankings on openrouter.ai.
         self.models = models
 
-        self._.on_response = OpenRouter.on_response
+        self.on_response = OpenRouter.on_response
 
     def chat(self, *user_prompt: str, **kwargs):
         if self.models:
@@ -53,7 +53,7 @@ class OpenRouter(API):
             r = super().chat(*user_prompt, **kwargs)
         except requests.HTTPError as e:
             if e.response.status_code == 429 and kwargs.get('retry'):
-                time.sleep(1)
+                time.sleep(1)# TODO move it to retry
                 return self.chat(*user_prompt, **kwargs)
             else: raise
         if self.models:
