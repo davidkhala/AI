@@ -47,3 +47,15 @@ class SiliconFlow(API):
         }
         response = self.request(f"{self.base_url}/embeddings", "POST", json=json)
         return [_['embedding'] for _ in response['data']]
+
+    def which(self, query: str, documents: list[str], **kwargs):
+        json = {
+            'model': self.model,
+            'query': query,
+            'documents': documents,
+            **kwargs
+        }
+        response = self.request(f"{self.base_url}/rerank", "POST", json=json)
+        most_relevant = max(response['results'], key=lambda x: x['relevance_score'])
+        return documents[most_relevant['index']]
+
