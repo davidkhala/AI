@@ -39,17 +39,22 @@ class EmbeddingTestCase(unittest.TestCase):
 
 
 class RerankTestCase(unittest.TestCase):
+
     def test_model_compare(self):
         _.model = 'BAAI/bge-reranker-v2-m3'
         query = 'apple'
         docs = ["apple", "banana", "fruit", "vegetable"]
-        self.assertEqual('apple', _.which(query, docs))
+        self.assertEqual('apple', _.which(query, docs)[0])
         _.model = 'Qwen/Qwen3-Reranker-8B'
-        self.assertEqual('banana', _.which(query, docs)) # unnatural model
+        self.assertEqual('banana', _.which(query, docs)[0]) # unnatural model
         _.model = 'Qwen/Qwen3-Reranker-4B'
-        self.assertEqual('banana', _.which(query, docs)) # unnatural model
+        self.assertEqual('banana', _.which(query, docs)[0]) # unnatural model
         _.model = 'Qwen/Qwen3-Reranker-0.6B'
-        self.assertEqual('apple', _.which(query, docs))
-
+        self.assertEqual('apple', _.which(query, docs)[0])
+    def test_null(self):
+        _.model = 'BAAI/bge-reranker-v2-m3'
+        with self.assertRaises(HTTPError) as e:
+            _.which('apple', []) # bad request
+        self.assertEqual(400, e.exception.response.status_code)
 if __name__ == '__main__':
     unittest.main()
