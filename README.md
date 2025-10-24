@@ -1,2 +1,2 @@
 # AI
-AI, ML index
+GenAI index

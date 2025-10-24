@@ -5,7 +5,13 @@ from openai import AzureOpenAI, OpenAI
 from davidkhala.ai.openai import Client
 
 
-class ModelDeploymentClient(Client):
+class AzureHosted(Client):
+    def chat(self, *user_prompt, **kwargs):
+        if 'web_search_options' in kwargs:
+            raise ValueError('Web search options not supported in any models of Azure AI Foundry')
+        return super().chat(*user_prompt, **kwargs)
+
+class ModelDeploymentClient(AzureHosted):
     def __init__(self, key, deployment):
         self.client = AzureOpenAI(
             api_version="2024-12-01-preview",  # mandatory
@@ -15,7 +21,7 @@ class ModelDeploymentClient(Client):
 
 
 @warnings.deprecated("Azure Open AI is deprecated. Please migrate to Azure AI Foundry")
-class OpenAIClient(Client):
+class OpenAIClient(AzureHosted):
 
     def __init__(self, api_key, project):
         self.client = OpenAI(

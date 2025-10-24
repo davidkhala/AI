@@ -17,6 +17,7 @@ class OpenAITestCase(unittest.TestCase):
         self.client.as_chat()
         print(self.client.chat("hello"))
 
+
 class ModelDeploymentTestCase(unittest.TestCase):
     def setUp(self):
         key = os.environ.get("DEPLOYMENT_KEY")
@@ -25,14 +26,17 @@ class ModelDeploymentTestCase(unittest.TestCase):
 
     def test_connect(self):
         self.client.connect()
+
     def test_chat(self):
         self.client.as_chat("gpt-4o", "You are a helpful assistant.")
         response = self.client.chat("Don't reply me anything now.", "What is your model name?")
         self.assertEqual(1, len(response))
         print(response[0])
+
     def test_embedding(self):
         self.client.as_embeddings("text-embedding-3-large")
         print(self.client.encode("Attention is all you need"))
+
 
 if __name__ == '__main__':
     unittest.main()

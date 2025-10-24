@@ -22,7 +22,7 @@ class Client(AbstractClient):
         )
         return [item.embedding for item in response.data]
 
-    def chat(self, *user_prompt):
+    def chat(self, *user_prompt, **kwargs):
 
         messages = [
             *self.messages,
@@ -47,7 +47,8 @@ class Client(AbstractClient):
         response = self.client.chat.completions.create(
             model=self.model,
             messages=messages,
-            n=self.n
+            n=self.n,
+            **kwargs
         )
         contents = [choice.message.content for choice in response.choices]
         assert len(contents) == self.n
