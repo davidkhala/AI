@@ -1,9 +1,11 @@
+import os
 import unittest
 
 import onnx
 import onnxruntime
 
 from davidkhala.ai.huggingface import clone
+from davidkhala.ai.huggingface.inference import API
 
 
 class BGETestCase(unittest.TestCase):
@@ -33,6 +35,15 @@ class BGETestCase(unittest.TestCase):
         onnx_path = bge_m3_path('huggingface/bge_m3_model')
         sess_options = onnxruntime.SessionOptions()
         onnxruntime.InferenceSession(onnx_path, sess_options)
+
+
+class InferenceTestCase(unittest.TestCase):
+    def test_sample(self):
+        token = os.environ.get('PAT')
+        i = API(token)
+        i.as_model("google-bert/bert-base-uncased")
+        r = i.call(inputs = "The goal of life is [MASK].", raw_response=True)
+        print(r) # FIXME always 404
 
 
 if __name__ == '__main__':
