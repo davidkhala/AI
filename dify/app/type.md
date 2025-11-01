@@ -2,6 +2,8 @@ You cannot change type of existing app
 # type: Workflow
 > Agentic flow for intelligent automations
 - convertable to tool
+  - **Immutable**. Once you publish it by configure `Workflow as tool`. It is a snapshot that will not get updated by `Publish Update`
+  - To update it, you need to delete the derived workflow tool and recreate it.
 Start Node
 - does not have `sys.query`
 

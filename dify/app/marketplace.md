@@ -1,6 +1,15 @@
-# [data analysis](https://marketplace.dify.ai/plugins/digitforce/data_analysis)
-powered by https://ada.im
+# data analysis tools
 
+External
+- [data analysis](https://marketplace.dify.ai/plugins/digitforce/data_analysis)
+  - powered by https://ada.im
+
+Data Visualization
+- [langgenius/echarts](https://marketplace.dify.ai/plugins/langgenius/echarts)
+- [langgenius/chart](https://marketplace.dify.ai/plugins/langgenius/chart)
+
+
+# Database tools
 # [database](https://marketplace.dify.ai/plugins/hjlarry/database)
 [source](https://github.com/hjlarry/dify-plugin-database)
 
