@@ -1,7 +1,7 @@
 app:
-  description: using native Dify chart to create all 3 types for charts, return as list of files
-  icon: 📊
-  icon_background: '#FFE4E8'
+  description: use Dify native chart
+  icon: bar_chart
+  icon_background: '#FFEAD5'
   mode: workflow
   name: chart tool
   use_icon_as_answer_icon: false
@@ -118,67 +118,57 @@ workflow:
       type: custom
       zIndex: 0
     - data:
+        isInIteration: false
         isInLoop: false
         sourceType: code
-        targetType: tool
-      id: 1761961848908-source-1761924857017-target
+        targetType: if-else
+      id: 1761961848908-source-1762041161409-target
       source: '1761961848908'
       sourceHandle: source
+      target: '1762041161409'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: if-else
+      id: 17619620443190-source-1762041161409-target
+      source: '17619620443190'
+      sourceHandle: source
+      target: '1762041161409'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: tool
+      id: 1762041161409-true-1761924857017-target
+      source: '1762041161409'
+      sourceHandle: 'true'
       target: '1761924857017'
       targetHandle: target
       type: custom
       zIndex: 0
     - data:
         isInLoop: false
-        sourceType: code
+        sourceType: if-else
         targetType: tool
-      id: 1761961848908-source-1761924866918-target
-      source: '1761961848908'
-      sourceHandle: source
+      id: 1762041161409-00ead533-ff8e-4fd7-95d2-6b69b90e86af-1761924866918-target
+      source: '1762041161409'
+      sourceHandle: 00ead533-ff8e-4fd7-95d2-6b69b90e86af
       target: '1761924866918'
       targetHandle: target
       type: custom
       zIndex: 0
     - data:
         isInLoop: false
-        sourceType: code
+        sourceType: if-else
         targetType: tool
-      id: 1761961848908-source-1761924877247-target
-      source: '1761961848908'
-      sourceHandle: source
-      target: '1761924877247'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: code
-        targetType: tool
-      id: 17619620443190-source-1761924857017-target
-      source: '17619620443190'
-      sourceHandle: source
-      target: '1761924857017'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: code
-        targetType: tool
-      id: 17619620443190-source-1761924866918-target
-      source: '17619620443190'
-      sourceHandle: source
-      target: '1761924866918'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: code
-        targetType: tool
-      id: 17619620443190-source-1761924877247-target
-      source: '17619620443190'
-      sourceHandle: source
+      id: 1762041161409-cc89fda9-5789-4d6c-9577-57992d23524a-1761924877247-target
+      source: '1762041161409'
+      sourceHandle: cc89fda9-5789-4d6c-9577-57992d23524a
       target: '1761924877247'
       targetHandle: target
       type: custom
@@ -198,15 +188,27 @@ workflow:
           required: true
           type: paragraph
           variable: json
-      height: 88
+        - default: pie
+          hint: ''
+          label: Chart Type
+          max_length: 48
+          options:
+          - linear
+          - bar
+          - pie
+          placeholder: ''
+          required: true
+          type: select
+          variable: chart
+      height: 114
       id: '1761924822620'
       position:
         x: 0
-        y: 6
+        y: 36
       positionAbsolute:
         x: 0
-        y: 6
-      selected: true
+        y: 36
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -289,10 +291,10 @@ workflow:
       height: 52
       id: '1761924857017'
       position:
-        x: 724
+        x: 1086
         y: 0
       positionAbsolute:
-        x: 724
+        x: 1086
         y: 0
       selected: false
       sourcePosition: right
@@ -378,10 +380,10 @@ workflow:
       height: 52
       id: '1761924866918'
       position:
-        x: 724
+        x: 1086
         y: 132
       positionAbsolute:
-        x: 724
+        x: 1086
         y: 132
       selected: false
       sourcePosition: right
@@ -468,10 +470,10 @@ workflow:
       height: 52
       id: '1761924877247'
       position:
-        x: 724
+        x: 1086
         y: 264
       positionAbsolute:
-        x: 724
+        x: 1086
         y: 264
       selected: false
       sourcePosition: right
@@ -501,10 +503,10 @@ workflow:
       height: 140
       id: '1761924894041'
       position:
-        x: 1086
+        x: 1448
         y: 88
       positionAbsolute:
-        x: 1086
+        x: 1448
         y: 88
       selected: false
       sourcePosition: right
@@ -533,10 +535,10 @@ workflow:
       id: '1761961848908'
       position:
         x: 362
-        y: 9
+        y: 180
       positionAbsolute:
         x: 362
-        y: 9
+        y: 180
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -564,17 +566,67 @@ workflow:
       id: '17619620443190'
       position:
         x: 362
-        y: 141
+        y: 48
       positionAbsolute:
         x: 362
-        y: 141
+        y: 48
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: is
+            id: 73ee498a-4047-4221-84c6-59de0968e445
+            value: linear
+            varType: string
+            variable_selector:
+            - '1761924822620'
+            - chart
+          id: 'true'
+          logical_operator: and
+        - case_id: 00ead533-ff8e-4fd7-95d2-6b69b90e86af
+          conditions:
+          - comparison_operator: is
+            id: 97ce1f06-138a-4d39-b8e0-e0a7411c8dad
+            value: bar
+            varType: string
+            variable_selector:
+            - '1761924822620'
+            - chart
+          id: 00ead533-ff8e-4fd7-95d2-6b69b90e86af
+          logical_operator: and
+        - case_id: cc89fda9-5789-4d6c-9577-57992d23524a
+          conditions:
+          - comparison_operator: is
+            id: 8e887585-cfdf-4510-8434-c2ecbcfb8dc2
+            value: pie
+            varType: string
+            variable_selector:
+            - '1761924822620'
+            - chart
+          logical_operator: and
+        selected: false
+        title: IF/ELSE
+        type: if-else
+      height: 220
+      id: '1762041161409'
+      position:
+        x: 724
+        y: 1
+      positionAbsolute:
+        x: 724
+        y: 1
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 242
     viewport:
-      x: -164.8522338120183
-      y: 464.0624250685179
-      zoom: 0.923655537541026
+      x: 129.35359823893054
+      y: 416.19584703715867
+      zoom: 1.1530274241746021
   rag_pipeline_variables: []
