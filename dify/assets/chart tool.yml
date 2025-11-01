@@ -1,0 +1,580 @@
+app:
+  description: using native Dify chart to create all 3 types for charts, return as list of files
+  icon: 📊
+  icon_background: '#FFE4E8'
+  mode: workflow
+  name: chart tool
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/chart:0.0.2@2d207a8cd79e17cf730f5ac0cb41d982f2abe5c19f3f785a29a769154afefbab
+    version: null
+kind: app
+version: 0.4.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInLoop: false
+        sourceType: tool
+        targetType: end
+      id: 1761924857017-source-1761924894041-target
+      source: '1761924857017'
+      sourceHandle: source
+      target: '1761924894041'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: tool
+        targetType: end
+      id: 1761924866918-source-1761924894041-target
+      source: '1761924866918'
+      sourceHandle: source
+      target: '1761924894041'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: tool
+        targetType: end
+      id: 1761924877247-source-1761924894041-target
+      source: '1761924877247'
+      sourceHandle: source
+      target: '1761924894041'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: code
+      id: 1761924822620-source-1761961848908-target
+      source: '1761924822620'
+      sourceHandle: source
+      target: '1761961848908'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: start
+        targetType: code
+      id: 1761924822620-source-17619620443190-target
+      source: '1761924822620'
+      sourceHandle: source
+      target: '17619620443190'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: tool
+      id: 1761961848908-source-1761924857017-target
+      source: '1761961848908'
+      sourceHandle: source
+      target: '1761924857017'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: tool
+      id: 1761961848908-source-1761924866918-target
+      source: '1761961848908'
+      sourceHandle: source
+      target: '1761924866918'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: tool
+      id: 1761961848908-source-1761924877247-target
+      source: '1761961848908'
+      sourceHandle: source
+      target: '1761924877247'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: tool
+      id: 17619620443190-source-1761924857017-target
+      source: '17619620443190'
+      sourceHandle: source
+      target: '1761924857017'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: tool
+      id: 17619620443190-source-1761924866918-target
+      source: '17619620443190'
+      sourceHandle: source
+      target: '1761924866918'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: tool
+      id: 17619620443190-source-1761924877247-target
+      source: '17619620443190'
+      sourceHandle: source
+      target: '1761924877247'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        selected: false
+        title: Start
+        type: start
+        variables:
+        - default: '[{"measure":13, "group":"A"}, {"measure":20, "group":"B"}]'
+          hint: ''
+          label: data
+          max_length: 32000
+          options: []
+          placeholder: ''
+          required: true
+          type: paragraph
+          variable: json
+      height: 88
+      id: '1761924822620'
+      position:
+        x: 0
+        y: 6
+      positionAbsolute:
+        x: 0
+        y: 6
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        is_team_authorization: true
+        paramSchemas:
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: data for generating chart, each number should be separated by ";"
+            ja_JP: data for generating chart, each number should be separated by ";"
+            pt_BR: dados para gerar gráfico linear, cada número deve ser separado
+              por ";"
+            zh_Hans: 用于生成线性图表的数据，每个数字之间用 ";" 分隔
+          label:
+            en_US: data
+            ja_JP: data
+            pt_BR: dados
+            zh_Hans: 数据
+          llm_description: data for generating linear chart, data should be a string
+            contains a list of numbers like "1;2;3;4;5"
+          max: null
+          min: null
+          name: data
+          options: []
+          placeholder: null
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: X axis for chart, each text should be separated by ";"
+            ja_JP: X axis for chart, each text should be separated by ";"
+            pt_BR: Eixo X para gráfico linear, cada texto deve ser separado por ";"
+            zh_Hans: 线性图表的 x 轴，每个文本之间用 ";" 分隔
+          label:
+            en_US: X Axis
+            ja_JP: X Axis
+            pt_BR: Eixo X
+            zh_Hans: x 轴
+          llm_description: x axis for linear chart, x axis should be a string contains
+            a list of texts like "a;b;c;1;2" in order to match the data
+          max: null
+          min: null
+          name: x_axis
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: string
+        params:
+          data: ''
+          x_axis: ''
+        provider_id: langgenius/chart/chart
+        provider_name: langgenius/chart/chart
+        provider_type: builtin
+        selected: false
+        title: Linear Chart
+        tool_configurations: {}
+        tool_description: linear chart
+        tool_label: Linear Chart
+        tool_name: line_chart
+        tool_node_version: '2'
+        tool_parameters:
+          data:
+            type: mixed
+            value: '{{#1761961848908.result#}}'
+          x_axis:
+            type: mixed
+            value: '{{#17619620443190.result#}}'
+        type: tool
+      height: 52
+      id: '1761924857017'
+      position:
+        x: 724
+        y: 0
+      positionAbsolute:
+        x: 724
+        y: 0
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        is_team_authorization: true
+        paramSchemas:
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: data for generating chart, each number should be separated by ";"
+            ja_JP: data for generating chart, each number should be separated by ";"
+            pt_BR: dados para gerar gráfico de barras, cada número deve ser separado
+              por ";"
+            zh_Hans: 用于生成柱状图的数据，每个数字之间用 ";" 分隔
+          label:
+            en_US: data
+            ja_JP: data
+            pt_BR: dados
+            zh_Hans: 数据
+          llm_description: data for generating bar chart, data should be a string
+            contains a list of numbers like "1;2;3;4;5"
+          max: null
+          min: null
+          name: data
+          options: []
+          placeholder: null
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: X axis for chart, each text should be separated by ";"
+            ja_JP: X axis for chart, each text should be separated by ";"
+            pt_BR: Eixo X para gráfico de barras, cada texto deve ser separado por
+              ";"
+            zh_Hans: 柱状图的 x 轴，每个文本之间用 ";" 分隔
+          label:
+            en_US: X Axis
+            ja_JP: X Axis
+            pt_BR: Eixo X
+            zh_Hans: x 轴
+          llm_description: x axis for bar chart, x axis should be a string contains
+            a list of texts like "a;b;c;1;2" in order to match the data
+          max: null
+          min: null
+          name: x_axis
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: string
+        params:
+          data: ''
+          x_axis: ''
+        provider_id: langgenius/chart/chart
+        provider_name: langgenius/chart/chart
+        provider_type: builtin
+        selected: false
+        title: Bar Chart
+        tool_configurations: {}
+        tool_description: Bar chart
+        tool_label: Bar Chart
+        tool_name: bar_chart
+        tool_node_version: '2'
+        tool_parameters:
+          data:
+            type: mixed
+            value: '{{#1761961848908.result#}}'
+          x_axis:
+            type: mixed
+            value: '{{#17619620443190.result#}}'
+        type: tool
+      height: 52
+      id: '1761924866918'
+      position:
+        x: 724
+        y: 132
+      positionAbsolute:
+        x: 724
+        y: 132
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        is_team_authorization: true
+        paramSchemas:
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: data for generating chart, each number should be separated by ";"
+            ja_JP: data for generating chart, each number should be separated by ";"
+            pt_BR: dados para gerar gráfico de pizza, cada número deve ser separado
+              por ";"
+            zh_Hans: 用于生成饼图的数据，每个数字之间用 ";" 分隔
+          label:
+            en_US: data
+            ja_JP: data
+            pt_BR: dados
+            zh_Hans: 数据
+          llm_description: data for generating pie chart, data should be a string
+            contains a list of numbers like "1;2;3;4;5"
+          max: null
+          min: null
+          name: data
+          options: []
+          placeholder: null
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: Categories for chart, each category should be separated by ";"
+            ja_JP: Categories for chart, each category should be separated by ";"
+            pt_BR: Categorias para gráfico de pizza, cada categoria deve ser separada
+              por ";"
+            zh_Hans: 饼图的分类，每个分类之间用 ";" 分隔
+          label:
+            en_US: Categories
+            ja_JP: Categories
+            pt_BR: Categorias
+            zh_Hans: 分类
+          llm_description: categories for pie chart, categories should be a string
+            contains a list of texts like "a;b;c;1;2" in order to match the data,
+            each category should be split by ";"
+          max: null
+          min: null
+          name: categories
+          options: []
+          placeholder: null
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: string
+        params:
+          categories: ''
+          data: ''
+        provider_id: langgenius/chart/chart
+        provider_name: langgenius/chart/chart
+        provider_type: builtin
+        selected: false
+        title: Pie Chart
+        tool_configurations: {}
+        tool_description: Pie chart
+        tool_label: Pie Chart
+        tool_name: pie_chart
+        tool_node_version: '2'
+        tool_parameters:
+          categories:
+            type: mixed
+            value: '{{#17619620443190.result#}}'
+          data:
+            type: mixed
+            value: '{{#1761961848908.result#}}'
+        type: tool
+      height: 52
+      id: '1761924877247'
+      position:
+        x: 724
+        y: 264
+      positionAbsolute:
+        x: 724
+        y: 264
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        outputs:
+        - value_selector:
+          - '1761924866918'
+          - files
+          value_type: array[file]
+          variable: bar
+        - value_selector:
+          - '1761924857017'
+          - files
+          value_type: array[file]
+          variable: line
+        - value_selector:
+          - '1761924877247'
+          - files
+          value_type: array[file]
+          variable: pie
+        selected: false
+        title: End
+        type: end
+      height: 140
+      id: '1761924894041'
+      position:
+        x: 1086
+        y: 88
+      positionAbsolute:
+        x: 1086
+        y: 88
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        code: "\nimport json\ndef main(data: str):\n    parsed = json.loads(data)\n\
+          \    measures = [str(item[\"measure\"]) for item in parsed]\n    return\
+          \ {\n        \"result\": \";\".join(measures),\n    }\n"
+        code_language: python3
+        outputs:
+          result:
+            children: null
+            type: string
+        selected: false
+        title: to_fact
+        type: code
+        variables:
+        - value_selector:
+          - '1761924822620'
+          - json
+          value_type: string
+          variable: data
+      height: 52
+      id: '1761961848908'
+      position:
+        x: 362
+        y: 9
+      positionAbsolute:
+        x: 362
+        y: 9
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        code: "\nimport json\ndef main(data: str):\n    parsed = json.loads(data)\n\
+          \    measures = [str(item[\"group\"]) for item in parsed]\n    return {\n\
+          \        \"result\": \";\".join(measures),\n    }\n"
+        code_language: python3
+        outputs:
+          result:
+            children: null
+            type: string
+        selected: false
+        title: to_dimension
+        type: code
+        variables:
+        - value_selector:
+          - '1761924822620'
+          - json
+          value_type: string
+          variable: data
+      height: 52
+      id: '17619620443190'
+      position:
+        x: 362
+        y: 141
+      positionAbsolute:
+        x: 362
+        y: 141
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    viewport:
+      x: -164.8522338120183
+      y: 464.0624250685179
+      zoom: 0.923655537541026
+  rag_pipeline_variables: []
