@@ -95,52 +95,6 @@ workflow:
       type: custom
       zIndex: 0
     - data:
-        isInIteration: false
-        isInLoop: false
-        sourceType: start
-        targetType: code
-      id: 1761924822620-source-1761961848908-target
-      source: '1761924822620'
-      sourceHandle: source
-      target: '1761961848908'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: start
-        targetType: code
-      id: 1761924822620-source-17619620443190-target
-      source: '1761924822620'
-      sourceHandle: source
-      target: '17619620443190'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInIteration: false
-        isInLoop: false
-        sourceType: code
-        targetType: if-else
-      id: 1761961848908-source-1762041161409-target
-      source: '1761961848908'
-      sourceHandle: source
-      target: '1762041161409'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInLoop: false
-        sourceType: code
-        targetType: if-else
-      id: 17619620443190-source-1762041161409-target
-      source: '17619620443190'
-      sourceHandle: source
-      target: '1762041161409'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
         isInLoop: false
         sourceType: if-else
         targetType: tool
@@ -173,21 +127,23 @@ workflow:
       targetHandle: target
       type: custom
       zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: start
+        targetType: if-else
+      id: 1761924822620-source-1762041161409-target
+      source: '1761924822620'
+      sourceHandle: source
+      target: '1762041161409'
+      targetHandle: target
+      type: custom
+      zIndex: 0
     nodes:
     - data:
-        selected: false
+        selected: true
         title: Start
         type: start
         variables:
-        - default: '[{"measure":13, "group":"A"}, {"measure":20, "group":"B"}]'
-          hint: ''
-          label: data
-          max_length: 32000
-          options: []
-          placeholder: ''
-          required: true
-          type: paragraph
-          variable: json
         - default: pie
           hint: ''
           label: Chart Type
@@ -200,15 +156,35 @@ workflow:
           required: true
           type: select
           variable: chart
-      height: 114
+        - default: ''
+          hint: ''
+          label: measure data for generating chart, each number should be separated
+            by ";"
+          max_length: 32000
+          options: []
+          placeholder: ''
+          required: true
+          type: paragraph
+          variable: data
+        - default: ''
+          hint: ''
+          label: Categories/[X Axis] for chart, each category should be separated
+            by ";"
+          max_length: 32000
+          options: []
+          placeholder: ''
+          required: true
+          type: paragraph
+          variable: categories
+      height: 140
       id: '1761924822620'
       position:
         x: 0
-        y: 36
+        y: 41
       positionAbsolute:
         x: 0
-        y: 36
-      selected: false
+        y: 41
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -283,18 +259,18 @@ workflow:
         tool_parameters:
           data:
             type: mixed
-            value: '{{#1761961848908.result#}}'
+            value: '{{#1761924822620.data#}}'
           x_axis:
             type: mixed
-            value: '{{#17619620443190.result#}}'
+            value: '{{#1761924822620.categories#}}'
         type: tool
       height: 52
       id: '1761924857017'
       position:
-        x: 1086
+        x: 704
         y: 0
       positionAbsolute:
-        x: 1086
+        x: 704
         y: 0
       selected: false
       sourcePosition: right
@@ -372,18 +348,18 @@ workflow:
         tool_parameters:
           data:
             type: mixed
-            value: '{{#1761961848908.result#}}'
+            value: '{{#1761924822620.data#}}'
           x_axis:
             type: mixed
-            value: '{{#17619620443190.result#}}'
+            value: '{{#1761924822620.categories#}}'
         type: tool
       height: 52
       id: '1761924866918'
       position:
-        x: 1086
+        x: 704
         y: 132
       positionAbsolute:
-        x: 1086
+        x: 704
         y: 132
       selected: false
       sourcePosition: right
@@ -462,18 +438,18 @@ workflow:
         tool_parameters:
           categories:
             type: mixed
-            value: '{{#17619620443190.result#}}'
+            value: '{{#1761924822620.categories#}}'
           data:
             type: mixed
-            value: '{{#1761961848908.result#}}'
+            value: '{{#1761924822620.data#}}'
         type: tool
       height: 52
       id: '1761924877247'
       position:
-        x: 1086
+        x: 704
         y: 264
       positionAbsolute:
-        x: 1086
+        x: 704
         y: 264
       selected: false
       sourcePosition: right
@@ -503,73 +479,11 @@ workflow:
       height: 140
       id: '1761924894041'
       position:
-        x: 1448
+        x: 1066
         y: 88
       positionAbsolute:
-        x: 1448
+        x: 1066
         y: 88
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        code: "\nimport json\ndef main(data: str):\n    parsed = json.loads(data)\n\
-          \    measures = [str(item[\"measure\"]) for item in parsed]\n    return\
-          \ {\n        \"result\": \";\".join(measures),\n    }\n"
-        code_language: python3
-        outputs:
-          result:
-            children: null
-            type: string
-        selected: false
-        title: to_fact
-        type: code
-        variables:
-        - value_selector:
-          - '1761924822620'
-          - json
-          value_type: string
-          variable: data
-      height: 52
-      id: '1761961848908'
-      position:
-        x: 362
-        y: 180
-      positionAbsolute:
-        x: 362
-        y: 180
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      type: custom
-      width: 242
-    - data:
-        code: "\nimport json\ndef main(data: str):\n    parsed = json.loads(data)\n\
-          \    measures = [str(item[\"group\"]) for item in parsed]\n    return {\n\
-          \        \"result\": \";\".join(measures),\n    }\n"
-        code_language: python3
-        outputs:
-          result:
-            children: null
-            type: string
-        selected: false
-        title: to_dimension
-        type: code
-        variables:
-        - value_selector:
-          - '1761924822620'
-          - json
-          value_type: string
-          variable: data
-      height: 52
-      id: '17619620443190'
-      position:
-        x: 362
-        y: 48
-      positionAbsolute:
-        x: 362
-        y: 48
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -608,6 +522,7 @@ workflow:
             variable_selector:
             - '1761924822620'
             - chart
+          id: cc89fda9-5789-4d6c-9577-57992d23524a
           logical_operator: and
         selected: false
         title: IF/ELSE
@@ -615,10 +530,10 @@ workflow:
       height: 220
       id: '1762041161409'
       position:
-        x: 724
+        x: 342
         y: 1
       positionAbsolute:
-        x: 724
+        x: 342
         y: 1
       selected: false
       sourcePosition: right
@@ -626,7 +541,7 @@ workflow:
       type: custom
       width: 242
     viewport:
-      x: 129.35359823893054
-      y: 416.19584703715867
-      zoom: 1.1530274241746021
+      x: 438
+      y: 280
+      zoom: 0.7
   rag_pipeline_variables: []
