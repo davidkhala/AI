@@ -10,6 +10,7 @@ langchain = [
     "langgraph", "langchain",
     "langchain-openai" # required by openRouter
 ]
+ragflow = ["ragflow-sdk"]
 google = ["google-genai", "google-adk"]
 api = ["davidkhala.utils[http_request]"]
 hf = [
