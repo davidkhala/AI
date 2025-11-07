@@ -115,7 +115,7 @@ class Dataset(API):
                     filename = Path(parsed_url.path).name
                 content = r.content
             files['file'] = (filename, content)
-
+            # TODO use metadata to define fake filename as chunk name
             if document_id:
                 r = requests.post(f"{self.base_url}/documents/{document_id}/update-by-file", files=files,
                                   **self.options)
@@ -129,12 +129,10 @@ class Dataset(API):
 
         def list_documents(self) -> Iterable[DocumentDict]:
             return Iterator(self.list, None)
-        def has_document(self, name)->bool:
-            for documents in self.list_documents():
-                for doc in documents:
-                    if doc['name'] == name:
-                        return True
-            return False
+
+        def has_document(self, name) -> bool:
+            return any(name == item['name'] for row in self.list_documents() for item in row)
+
 
 class Document(API):
     def __init__(self, d: Dataset.Instance, document_id: str):
