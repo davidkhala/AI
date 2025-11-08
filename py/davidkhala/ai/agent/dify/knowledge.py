@@ -101,9 +101,14 @@ class Dataset(API):
             return self.request(self.base_url, "GET")
 
         def upload(self, filename, *, path=None, url=None, document_id=None):
+            """
+            don't work for html
+            work for markdown
+            TODO how to simulate console
+            """
             files = {}
             if path:
-                with open(path, 'r', encoding='utf-8') as f:
+                with open(path, 'rb') as f:
                     content = f.read()
                 if not filename:
                     filename = os.path.basename(path)
@@ -115,8 +120,8 @@ class Dataset(API):
                     filename = Path(parsed_url.path).name
                 content = r.content
             files['file'] = (filename, content)
-            # TODO use metadata to define fake filename as chunk name
             if document_id:
+                # don't work for html
                 r = requests.post(f"{self.base_url}/documents/{document_id}/update-by-file", files=files,
                                   **self.options)
             else:

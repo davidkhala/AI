@@ -4,14 +4,6 @@
 # [Studio](./app)
 
 
-# Knowledge
-Data source 只支持
-- import from file
-- Sync from Notion
-- Sync from website (选择爬虫provider)
-  - Jina Reader
-  - Firecrawl
-
 # [Dify cloud](https://cloud.dify.ai/)
 
 ## plans
