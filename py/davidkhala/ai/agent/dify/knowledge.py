@@ -142,15 +142,13 @@ class Dataset(API):
 class Document(API):
     def __init__(self, d: Dataset.Instance, document_id: str):
         super().__init__(d.api_key, f"{d.base_url}/documents/{document_id}")
+        try:
+            self.get()
+            self.exist = True
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 404:
+                self.exist = False
+            raise e
 
     def get(self):
         return self.request(self.base_url, "GET")
-
-    def exist(self):
-        try:
-            self.get()
-            return True
-        except requests.exceptions.HTTPError as e:
-            if e.response.status_code == 404:
-                return False
-            raise e

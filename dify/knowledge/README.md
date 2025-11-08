@@ -18,7 +18,8 @@ Native Data source
 - Sync from Notion
 - Sync from website (crawler)
   - Jina Reader: 20 subpages
-    - cannot read this page 
+    - cannot read this page
+    - dedup: for different urls under same domain, top 20 Subpages is always the same  
   - Firecrawl
 
 
