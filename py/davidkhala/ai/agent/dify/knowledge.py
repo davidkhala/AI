@@ -141,11 +141,38 @@ class Dataset(API):
                 'limit': size
             })
 
-        def list_documents(self) -> Iterable[list[DocumentDict]]:
-            return Iterator(self.paginate_documents, None)
+        def list_documents(self) -> Iterable[DocumentDict]:
+            for document_batch in Iterator(self.paginate_documents, None):
+                for document in document_batch:
+                    yield document
 
         def has_document(self, name) -> bool:
             return any(name == item['name'] for row in self.list_documents() for item in row)
+
+
+class ChunkDict(TypedDict):
+    id: str
+    position: int
+    document_id: str
+    content: str
+    sign_content: str  # trimmed version of content
+    answer: Optional[str]  # only used in QA chunk
+    word_count: int
+    tokens: int
+    keywords: Optional[list[str]]
+    index_node_id: str  # chunk 在向量索引中的节点 ID
+    index_node_hash: str  # hash of sign_content
+    hit_count: int
+    enabled: bool
+    status: str  # 'completed'
+    created_at: int  # timestamp
+    updated_at: int  # timestamp
+    completed_at: int  # timestamp
+    created_by: str  # user id
+    child_chunks: list
+    error: Optional
+    stopped_at: Optional[int]  # timestamp
+    disabled_at: Optional[int]  # timestamp
 
 
 class Document(API):
@@ -162,10 +189,14 @@ class Document(API):
 
     def get(self):
         return self.request(self.base_url, "GET")
+
     def paginate_chunks(self, page=1, size=20):
         return self.request(f"{self.base_url}/segments", "GET", params={
-            'page':page,
-            'limit':size
+            'page': page,
+            'limit': size
         })
-    def list_chunks(self)->Iterable[list]: # TODO ChunkDict
-        return Iterator(self.paginate_chunks, None)
+
+    def list_chunks(self) -> Iterable[ChunkDict]:
+        for chunk_batch in Iterator(self.paginate_chunks, None):
+            for chunk in chunk_batch:
+                yield chunk

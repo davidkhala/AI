@@ -61,10 +61,9 @@ class DocumentTest(unittest.TestCase):
         self.assertEqual(context.exception.response.status_code, 403)
 
     def test_list(self):
-        for documents in self.client.list_documents():
-            for doc in documents:
-                # doc has content, can be length
-                print(doc['name'])
+        for doc in self.client.list_documents():
+            # doc has content, can be length
+            print(doc['name'])
 
     def test_has(self):
         name = 'Admission - Technological and Higher Education Institute of Hong Kong.html'
@@ -82,10 +81,9 @@ class DocumentTest(unittest.TestCase):
     def test_chunks(self):
         doc_id = '3568dd90-fe30-4df3-8cc3-9f8a1cb9ee06'
         doc = Document(self.client, doc_id)
-        for chunks in doc.list_chunks():
-            for chunk in chunks:
-                print('position',chunk['position'])
-                print(chunk['content'])
+        for chunk in doc.list_chunks():
+            print(chunk['sign_content'])
+
 
 if __name__ == '__main__':
     unittest.main()
