@@ -178,12 +178,14 @@ class ChunkDict(TypedDict):
 class Document(API):
     def __init__(self, d: Dataset.Instance, document_id: str):
         super().__init__(d.api_key, f"{d.base_url}/documents/{document_id}")
+
+    def exist(self):
         try:
             self.get()
-            self.exist = True
+            return True
         except requests.exceptions.HTTPError as e:
             if e.response.status_code == 404:
-                self.exist = False
+                return False
             else:
                 raise e
 
@@ -200,3 +202,7 @@ class Document(API):
         for chunk_batch in Iterator(self.paginate_chunks, None):
             for chunk in chunk_batch:
                 yield chunk
+
+    def delete(self):
+        if self.exist():
+            self.request(self.base_url, "DELETE")

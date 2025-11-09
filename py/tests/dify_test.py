@@ -39,13 +39,14 @@ class DocumentTest(unittest.TestCase):
         from datetime import datetime
         composite_file = f"{datetime.now().strftime("%Y%m%d_%H%M%S")}.README.md"
         r = self.client.upload(composite_file, url=url)
+
     def test_upload_pdf(self):
         pdf_path = resolve(__file__, '../fixtures/empty.pdf')
         self.client.upload(None, path=pdf_path)
-    def test_update(self):
-        ... # FIXME cannot rename
-        # TODO try update content of README.md
 
+    def test_update(self):
+        ...  # FIXME cannot rename
+        # TODO try update content of README.md
 
     def test_unsupported_upload(self):
         # png is not supported
@@ -73,16 +74,21 @@ class DocumentTest(unittest.TestCase):
     def test_exist(self):
         doc_id = '3568dd90-fe30-4df3-8cc3-9f8a1cb9ee06'
         doc = Document(self.client, doc_id)
-        self.assertTrue(doc.exist)
+        self.assertTrue(doc.exist())
         doc_id = doc_id + '1'
         doc = Document(self.client, doc_id)
-        self.assertFalse(doc.exist)
+        self.assertFalse(doc.exist())
 
     def test_chunks(self):
         doc_id = '3568dd90-fe30-4df3-8cc3-9f8a1cb9ee06'
         doc = Document(self.client, doc_id)
         for chunk in doc.list_chunks():
             print(chunk['sign_content'])
+
+    def test_del(self):
+        doc_id = '6006f9db-4e7b-4760-a5b5-b8894ac8914c'
+        doc = Document(self.client, doc_id)
+        doc.delete()
 
 
 if __name__ == '__main__':
