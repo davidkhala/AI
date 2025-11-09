@@ -157,7 +157,15 @@ class Document(API):
         except requests.exceptions.HTTPError as e:
             if e.response.status_code == 404:
                 self.exist = False
-            raise e
+            else:
+                raise e
 
     def get(self):
         return self.request(self.base_url, "GET")
+    def paginate_chunks(self, page=1, size=20):
+        return self.request(f"{self.base_url}/segments", "GET", params={
+            'page':page,
+            'limit':size
+        })
+    def list_chunks(self)->Iterable[list]: # TODO ChunkDict
+        return Iterator(self.paginate_chunks, None)

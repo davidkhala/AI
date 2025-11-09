@@ -4,7 +4,6 @@ import unittest
 from davidkhala.utils.syntax.path import resolve
 from requests import HTTPError
 
-from davidkhala.ai.agent.dify import with_datetime
 from davidkhala.ai.agent.dify.knowledge import Dataset, Document
 
 
@@ -37,7 +36,8 @@ class DocumentTest(unittest.TestCase):
         # doc_id = r['id']
         # r = self.client.upload(None, url=url,document_id=doc_id)
         # print(r)
-        composite_file = with_datetime("README.md")
+        from datetime import datetime
+        composite_file = f"{datetime.now().strftime("%Y%m%d_%H%M%S")}.README.md"
         r = self.client.upload(composite_file, url=url)
     def test_upload_pdf(self):
         pdf_path = resolve(__file__, '../fixtures/empty.pdf')
@@ -72,14 +72,20 @@ class DocumentTest(unittest.TestCase):
         self.assertFalse(self.client.has_document('README'))
 
     def test_exist(self):
-        doc_id = '26cc41ea-14a1-425d-934a-f68cb258a91e' + '1'
+        doc_id = '3568dd90-fe30-4df3-8cc3-9f8a1cb9ee06'
         doc = Document(self.client, doc_id)
-        self.assertFalse(doc.exist())
-        doc_id = '26cc41ea-14a1-425d-934a-f68cb258a91e'
+        self.assertTrue(doc.exist)
+        doc_id = doc_id + '1'
         doc = Document(self.client, doc_id)
-        self.assertTrue(doc.exist())
-        print(doc.get())
+        self.assertFalse(doc.exist)
 
+    def test_chunks(self):
+        doc_id = '3568dd90-fe30-4df3-8cc3-9f8a1cb9ee06'
+        doc = Document(self.client, doc_id)
+        for chunks in doc.list_chunks():
+            for chunk in chunks:
+                print('position',chunk['position'])
+                print(chunk['content'])
 
 if __name__ == '__main__':
     unittest.main()
