@@ -63,7 +63,7 @@ class DocumentTest(unittest.TestCase):
     def test_list(self):
         for documents in self.client.list_documents():
             for doc in documents:
-                print(doc)
+                # doc has content, can be length
                 print(doc['name'])
 
     def test_has(self):

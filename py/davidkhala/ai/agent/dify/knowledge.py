@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Iterable, TypedDict, Callable
+from typing import Iterable, TypedDict, Callable, Any, Optional
 from urllib.parse import urlparse
 
 import requests
@@ -41,14 +41,16 @@ class Iterator(Iterable):
     def __iter__(self):
         return self
 
-    def __init__(self, get_fn: Callable, r):
+    def __init__(self, get_fn: Callable[[int, int], Any], r: Optional[dict]):
         self.response = r
         self.fn = get_fn
 
     def __next__(self):
         if self.response and not self.response['has_more']:
             raise StopIteration
-        self.response = self.fn()
+        page = 1 if not self.response else self.response['page'] + 1
+        limit = None if not self.response else self.response['limit']
+        self.response = self.fn(page, limit)
         return self.response['data']
 
 
@@ -81,15 +83,19 @@ class Dataset(API):
     def __init__(self, api_key: str, base_url="https://api.dify.ai/v1"):
         super().__init__(api_key, f"{base_url}/datasets")
 
-    def list(self):
-        return self.request(self.base_url, "GET")
+    def paginate_datasets(self, page=1, size=20):
+        r = self.request(self.base_url, "GET", params={
+            'page': page,
+            'limit': size,
+        })
+        return r
 
-    def list_all(self) -> Iterable[DatasetDict]:
-        return Iterator(self.list, None)
+    def list_datasets(self) -> Iterable[list[DatasetDict]]:
+        return Iterator(self.paginate_datasets, None)
 
     @property
     def ids(self):
-        for sub_list in self.list_all():
+        for sub_list in self.list_datasets():
             for dataset in sub_list:
                 yield dataset['id']
 
@@ -129,11 +135,14 @@ class Dataset(API):
             r = self.on_response(r)
             return r['document']
 
-        def list(self):
-            return self.request(f"{self.base_url}/documents", "GET")
+        def paginate_documents(self, page=1, size=20):
+            return self.request(f"{self.base_url}/documents", "GET", params={
+                'page': page,
+                'limit': size
+            })
 
-        def list_documents(self) -> Iterable[DocumentDict]:
-            return Iterator(self.list, None)
+        def list_documents(self) -> Iterable[list[DocumentDict]]:
+            return Iterator(self.paginate_documents, None)
 
         def has_document(self, name) -> bool:
             return any(name == item['name'] for row in self.list_documents() for item in row)
