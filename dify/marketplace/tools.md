@@ -25,7 +25,12 @@ Data Visualization
 
 # Native
 [Dify Extractor](https://marketplace.dify.ai/plugins/langgenius/dify_extractor)
-- It always masks email, replacing it with `[email protected]` 
+- It always masks email in html, replacing it with `[email protected]`
+  - solution: crawler data source has no masking 
 
+
+# knowledge
+[knowledge](https://marketplace.dify.ai/plugins/hjlarry/knowledge)
+- into knowledge 
 # Disqualified
 HelloDB

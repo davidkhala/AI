@@ -29,6 +29,7 @@ Native Data source
     - cannot read this page
     - dedup: for different urls under same domain, top 20 Subpages is always the same  
   - Firecrawl
+    - good at read current page
 
 
 provision only
