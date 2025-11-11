@@ -22,5 +22,10 @@ Data Visualization
 - only support as individual Node in app type=`Workflow` or `Chatflow`
 - cannot support [Knowledge Pipeline] 
 
+
+# Native
+[Dify Extractor](https://marketplace.dify.ai/plugins/langgenius/dify_extractor)
+- It always masks email, replacing it with `[email protected]` 
+
 # Disqualified
 HelloDB

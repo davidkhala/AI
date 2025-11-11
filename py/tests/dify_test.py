@@ -90,13 +90,22 @@ class DocumentTest(unittest.TestCase):
         doc = Document(self.client, doc_id)
         doc.delete()
 
-class FeedbacksTest(unittest.TestCase):
+from davidkhala.ai.agent.dify.app import Feedbacks, Conversation
+class ChatAppTest(unittest.TestCase):
     api_key = os.getenv('APP_API_KEY')
-    def test_list(self):
-        from davidkhala.ai.agent.dify.app import Feedbacks
+    def test_list_feedback(self):
+
         f = Feedbacks(self.api_key)
         for feedback in f.list_feedbacks():
-            print(feedback)
+            print(feedback['content'])
+    def test_messages(self):
+        user = '999196d8-0842-4617-adcf-aa46e0808404'
+        conversation_id = 'f96b5cfc-7006-4afe-b8fe-e0e04374d40f'
+        c = Conversation(self.api_key, user)
+        with self.assertRaises(HTTPError) as context:
+            c.paginate_messages(conversation_id)
+        self.assertEqual(context.exception.response.status_code, 404) # security isolation
+
 
 
 if __name__ == '__main__':
