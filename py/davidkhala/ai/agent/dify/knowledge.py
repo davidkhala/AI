@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Iterable, TypedDict, Callable, Any, Optional
+from typing import Iterable, TypedDict, Optional
 from urllib.parse import urlparse
 
 import requests
 
-from davidkhala.ai.agent.dify.base import API
+from davidkhala.ai.agent.dify.base import API, Iterator
 
 
 class DatasetDict(TypedDict):
@@ -35,23 +35,6 @@ class DatasetDict(TypedDict):
     retrieval_model_dict: dict
     external_retrieval_model: dict
     external_knowledge_info: dict
-
-
-class Iterator(Iterable):
-    def __iter__(self):
-        return self
-
-    def __init__(self, get_fn: Callable[[int, int], Any], r: Optional[dict]):
-        self.response = r
-        self.fn = get_fn
-
-    def __next__(self):
-        if self.response and not self.response['has_more']:
-            raise StopIteration
-        page = 1 if not self.response else self.response['page'] + 1
-        limit = None if not self.response else self.response['limit']
-        self.response = self.fn(page, limit)
-        return self.response['data']
 
 
 class DocumentDict(TypedDict):

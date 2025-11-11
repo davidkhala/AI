@@ -8,7 +8,7 @@ from davidkhala.ai.agent.dify.knowledge import Dataset, Document
 
 
 class DatasetTest(unittest.TestCase):
-    api_key = os.getenv('API_KEY')
+    api_key = os.getenv('KB_API_KEY')
     client = Dataset(api_key)
 
     def test_list(self):
@@ -89,6 +89,14 @@ class DocumentTest(unittest.TestCase):
         doc_id = '6006f9db-4e7b-4760-a5b5-b8894ac8914c'
         doc = Document(self.client, doc_id)
         doc.delete()
+
+class FeedbacksTest(unittest.TestCase):
+    api_key = os.getenv('APP_API_KEY')
+    def test_list(self):
+        from davidkhala.ai.agent.dify.app import Feedbacks
+        f = Feedbacks(self.api_key)
+        for feedback in f.list_feedbacks():
+            print(feedback)
 
 
 if __name__ == '__main__':
