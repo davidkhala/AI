@@ -26,7 +26,10 @@ Data Visualization
 # Native
 [Dify Extractor](https://marketplace.dify.ai/plugins/langgenius/dify_extractor)
 - It always masks email in html, replacing it with `[email protected]`
-  - solution: crawler data source has no masking 
+  - solution: crawler data source has no masking
+  - solution: combine use Doc Extractor with another html parser
+- Unsupported PDF types
+  - PDF from HTML by Microsoft Print to PDF 
 
 
 # knowledge
