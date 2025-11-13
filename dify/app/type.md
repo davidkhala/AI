@@ -23,7 +23,7 @@ defined by top-right corner
 >　LLM-based chatbot with simple setup
 # basic type: Agent
 > Intelligent agent with reasoning and autonomous tool use
-- convertable to tool
+
 # basic type: Text Generator
 > Al assistant for text generation tasks
 - aka. Completion
