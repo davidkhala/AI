@@ -17,6 +17,9 @@ chunk overlap: 10%-25% of max chunk size
 
 name is not unique: different documents can have same name
 
+chunk structure
+- Parent-child：适用于精准查找。通过将child chunk尺寸设为关键词长度 
+
 
 # Dataset 
 Native Data source
