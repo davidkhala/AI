@@ -2,7 +2,7 @@ import json
 
 import requests
 
-from davidkhala.ai.agent.dify.base import API
+from davidkhala.ai.agent.dify.api import API
 
 
 class Feedbacks(API):

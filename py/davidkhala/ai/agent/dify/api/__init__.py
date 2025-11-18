@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import Iterable, Callable, Any, Optional
 
 from davidkhala.utils.http_request import Request

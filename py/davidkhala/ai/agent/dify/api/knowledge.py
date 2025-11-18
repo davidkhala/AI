@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 
 import requests
 
-from davidkhala.ai.agent.dify.base import API, Iterator
+from davidkhala.ai.agent.dify.api import API, Iterator
 
 
 class DatasetDict(TypedDict):
