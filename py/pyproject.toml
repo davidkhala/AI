@@ -17,6 +17,9 @@ hf = [
     "huggingface_hub", 'hf_xet',
     'onnxruntime','onnx' # for test only
 ]
+openrouter = [
+    "openrouter", "davidkhala.utils[http_request]"
+]
 ali = ["dashscope"]
 azure = ["openai"]
 telemetry = [

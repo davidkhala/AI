@@ -1,15 +1,15 @@
 import os
 import unittest
 
-from davidkhala.ai.api.openrouter import OpenRouter
+from davidkhala.ai.api.openrouter import OpenRouter as OpenRouterAPI
+from davidkhala.ai.openrouter import Client as OpenRouterClient
 from requests import HTTPError
 
 
 class APITestCase(unittest.TestCase):
 
     def setUp(self):
-        self.api_key = os.environ.get('API_KEY')
-        self.openrouter = OpenRouter(self.api_key)
+        self.openrouter = OpenRouterAPI(os.environ.get('API_KEY'))
 
     def test_chat(self):
         self.openrouter.as_chat("deepseek/deepseek-chat-v3.1:free")
@@ -36,6 +36,7 @@ class APITestCase(unittest.TestCase):
             with self.assertRaises(HTTPError) as e:
                 self.openrouter.chat('-')
             self.assertEqual(e.exception.response.status_code, 400)
+
     def test_google(self):
         self.openrouter.as_chat('google/gemini-2.5-flash-lite-preview-09-2025')
         r = self.openrouter.chat('-')
@@ -47,6 +48,7 @@ class APITestCase(unittest.TestCase):
             self.openrouter.as_chat(model)
             r = self.openrouter.chat('return True')
             print(model, r['data'][0])
+
     def test_openai_limit(self):
         if os.environ.get('CI'):
             self.skipTest("openai is available in GitHub runner region")
@@ -54,6 +56,20 @@ class APITestCase(unittest.TestCase):
         with self.assertRaises(HTTPError) as e:
             self.openrouter.chat('-')
         self.assertEqual(e.exception.response.status_code, 403)
+
+
+class SDKTestCase(unittest.TestCase):
+    def setUp(self):
+        api_key = os.environ.get('API_KEY')
+        self.openrouter = OpenRouterClient(api_key)
+
+    def test_connect(self):
+        self.assertTrue(self.openrouter.connect())
+
+    def test_chat(self):
+        self.openrouter.as_chat('minimax/minimax-m2')
+        r = self.openrouter.chat('Hello!')
+        print(r)
 
 
 if __name__ == "__main__":
