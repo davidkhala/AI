@@ -4,13 +4,16 @@ import unittest
 from davidkhala.utils.syntax.path import resolve
 from requests import HTTPError
 
-from davidkhala.ai.agent.dify.knowledge import Dataset, Document
+from davidkhala.ai.agent.dify.api.knowledge import Dataset, Document
 
+class CloudTest(unittest.TestCase):
+    def setUp(self):
+        self.api_key = os.getenv('KB_API_KEY')
+class DatasetTest(CloudTest):
 
-class DatasetTest(unittest.TestCase):
-    api_key = os.getenv('KB_API_KEY')
-    client = Dataset(api_key)
-
+    def setUp(self):
+        super().setUp()
+        self.client = Dataset(self.api_key)
     def test_list(self):
         for _id in self.client.ids:
             print(_id)
@@ -21,10 +24,11 @@ class DatasetTest(unittest.TestCase):
         print(instance.get())
 
 
-class DocumentTest(unittest.TestCase):
+class DocumentTest(CloudTest):
     def setUp(self):
+        super().setUp()
         dataset_id = '733e7159-2963-462d-b839-9c54d5f33a7e'
-        self.client = Dataset.Instance(DatasetTest.client, dataset_id)
+        self.client = Dataset.Instance(Dataset(self.api_key), dataset_id)
 
     def test_upload_readme(self):
         r = self.client.upload(None, path=resolve(__file__, "../../README.md"))
@@ -90,7 +94,7 @@ class DocumentTest(unittest.TestCase):
         doc = Document(self.client, doc_id)
         doc.delete()
 
-from davidkhala.ai.agent.dify.app import Feedbacks, Conversation
+from davidkhala.ai.agent.dify.api.app import Feedbacks, Conversation
 class ChatAppTest(unittest.TestCase):
     api_key = os.getenv('APP_API_KEY')
     def test_list_feedback(self):
@@ -105,8 +109,15 @@ class ChatAppTest(unittest.TestCase):
         with self.assertRaises(HTTPError) as context:
             c.paginate_messages(conversation_id)
         self.assertEqual(context.exception.response.status_code, 404) # security isolation
-
-
+from davidkhala.ai.agent.dify.ops.db import DB
+@unittest.skipIf(os.getenv('CI'), "open source deployment only")
+class LocalDeploymentTest(unittest.TestCase):
+    def setUp(self):
+        connection_str = "postgresql://postgres:difyai123456@localhost:5432/dify"
+        self.db = DB(connection_str)
+    def test_properties(self):
+        print(self.db.apps)
+        print(self.db.accounts)
 
 if __name__ == '__main__':
     unittest.main()
