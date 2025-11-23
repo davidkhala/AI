@@ -118,6 +118,14 @@ class LocalDeploymentTest(unittest.TestCase):
     def test_properties(self):
         print(self.db.apps)
         print(self.db.accounts)
+    def test_change_opener(self):
+        import json
+        app_id = '7b926e55-c453-43a4-9e98-e68e3d289fed'
+        config = self.db.app_config(app_id)
+        self.assertIsNotNone(config)
+        print(config.suggested_questions)
+        config.suggested_questions = json.dumps(['Question A', 'Question B'])
+        self.db.update_app_config(config)
 
 if __name__ == '__main__':
     unittest.main()

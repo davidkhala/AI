@@ -25,4 +25,6 @@ select app_id,
        dataset_configs,
        file_upload,
        text_to_speech
-from app_model_configs
+from app_model_configs;
+
+select * from app_model_configs;
