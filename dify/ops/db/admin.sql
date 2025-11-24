@@ -28,3 +28,15 @@ select app_id,
 from app_model_configs;
 
 select * from app_model_configs;
+-- knowledge base usage
+select * from dataset_queries where source = 'app' and created_by_role = 'end_user';
+
+-- user feedback
+SELECT
+    mf.*,
+    m.query,
+    m.answer,
+    m.message  -- conversation context
+FROM message_feedbacks mf
+LEFT JOIN messages m
+    ON mf.message_id = m.id;

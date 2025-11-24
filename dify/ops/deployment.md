@@ -1,7 +1,5 @@
 [source](https://github.com/langgenius/dify)
 
-
-
 # docker compose
 From source run
 ```

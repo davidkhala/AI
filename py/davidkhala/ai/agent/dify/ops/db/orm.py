@@ -7,11 +7,12 @@ from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
-class AppModelConfig(Base):
+class DifyBase(Base):
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.uuid_generate_v4())
+class AppModelConfig(DifyBase):
     __tablename__ = "app_model_configs"
     __table_args__ = {"schema": "public"}
 
-    id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.uuid_generate_v4())
     app_id = Column(UUID(as_uuid=True), nullable=False)
 
     provider = Column(String(255))

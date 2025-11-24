@@ -20,6 +20,9 @@ name is not unique: different documents can have same name
 chunk structure
 - Parent-child：适用于精准查找。通过将child chunk尺寸设为关键词长度 
 
+sync
+- sync will rerun the process of embedding
+- overwrite: existing modification on chunks will be lost
 
 # Dataset 
 Native Data source
