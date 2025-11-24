@@ -6,7 +6,7 @@
 
 
 # [Dify cloud](https://cloud.dify.ai/)
-
+current version: 1.10.0
 ## plans
 Free
 - up to 5 apps
@@ -22,6 +22,3 @@ No integration with
 
 Dify has not released any SDKs for program language
 - write your own with http API
-
-Immutable
-- 在 Workflow 的某个节点（比如某个 LLM 步骤）中，一旦设置了具体的模型，就不能更改了

@@ -11,4 +11,4 @@ docker compose up -d
 hardware resource consumed
 - 6 CPU
 - 2 GB memory
-- 6.5 GB container image 
+- 6.5 GB container image
