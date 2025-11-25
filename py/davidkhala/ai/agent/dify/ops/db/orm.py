@@ -8,6 +8,7 @@ from sqlalchemy.orm import declarative_base
 Base = declarative_base()
 
 class DifyBase(Base):
+    __abstract__ = True # keyword for SQLAlchemy
     id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.uuid_generate_v4())
 class AppModelConfig(DifyBase):
     __tablename__ = "app_model_configs"

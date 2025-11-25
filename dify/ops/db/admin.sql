@@ -30,6 +30,9 @@ from app_model_configs;
 select * from app_model_configs;
 -- knowledge base usage
 select * from dataset_queries where source = 'app' and created_by_role = 'end_user';
+-- chunk hit count
+select dataset_id, document_id, hit_count from document_segments;
+
 
 -- user feedback
 SELECT
@@ -40,3 +43,4 @@ SELECT
 FROM message_feedbacks mf
 LEFT JOIN messages m
     ON mf.message_id = m.id;
+

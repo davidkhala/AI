@@ -6,14 +6,18 @@ from requests import HTTPError
 
 from davidkhala.ai.agent.dify.api.knowledge import Dataset, Document
 
+
 class CloudTest(unittest.TestCase):
     def setUp(self):
         self.api_key = os.getenv('KB_API_KEY')
+
+
 class DatasetTest(CloudTest):
 
     def setUp(self):
         super().setUp()
         self.client = Dataset(self.api_key)
+
     def test_list(self):
         for _id in self.client.ids:
             print(_id)
@@ -94,38 +98,74 @@ class DocumentTest(CloudTest):
         doc = Document(self.client, doc_id)
         doc.delete()
 
+
 from davidkhala.ai.agent.dify.api.app import Feedbacks, Conversation
+
+
 class ChatAppTest(unittest.TestCase):
     api_key = os.getenv('APP_API_KEY')
-    def test_list_feedback(self):
 
+    def test_list_feedback(self):
         f = Feedbacks(self.api_key)
         for feedback in f.list_feedbacks():
             print(feedback['content'])
+
     def test_messages(self):
         user = '999196d8-0842-4617-adcf-aa46e0808404'
         conversation_id = 'f96b5cfc-7006-4afe-b8fe-e0e04374d40f'
         c = Conversation(self.api_key, user)
         with self.assertRaises(HTTPError) as context:
             c.paginate_messages(conversation_id)
-        self.assertEqual(context.exception.response.status_code, 404) # security isolation
+        self.assertEqual(context.exception.response.status_code, 404)  # security isolation
+
+
 from davidkhala.ai.agent.dify.ops.db import DB
+import json
+
+
 @unittest.skipIf(os.getenv('CI'), "open source deployment only")
 class LocalDeploymentTest(unittest.TestCase):
     def setUp(self):
         connection_str = "postgresql://postgres:difyai123456@localhost:5432/dify"
         self.db = DB(connection_str)
+
     def test_properties(self):
         print(self.db.apps)
         print(self.db.accounts)
-    def test_change_opener(self):
-        import json
-        app_id = '7b926e55-c453-43a4-9e98-e68e3d289fed'
+
+    def test_generate_conversation_opener(self):
+        from davidkhala.ai.openrouter import Client
+        # config
+        app_id = '4f3c212a-0dc8-4405-97ca-22914c79a21e'
+        question_size = 3
+        api_key = os.environ.get('OPENROUTER_API_KEY')
+        self.openrouter = Client(api_key)
+        self.openrouter.as_chat('minimax/minimax-m2')
         config = self.db.app_config(app_id)
         self.assertIsNotNone(config)
-        print(config.suggested_questions)
-        config.suggested_questions = json.dumps(['Question A', 'Question B'])
+        print('current suggested_questions', config.suggested_questions)
+        new_questions = []
+        for d in self.db.hit_run(question_size):
+            dataset_id = d['dataset_id']
+            document_id = d['document_id']
+            content = d['content']
+            questions = self.db.dataset_queries(dataset_id)
+            prompt = f"""
+            Based on below knowledge base document content, generate single question that user may ask against the content. 
+            Don't assume user have document content as prior knowledge.
+            You should learn and follow language style from sample questions listed below. And you respond generated question text only
+            
+            sample questions:
+            {questions}  
+            
+            document content is:
+            {content}
+            """
+            choices = self.openrouter.chat(prompt)
+            new_questions.append(choices[0].strip())
+        config.suggested_questions = json.dumps(new_questions)
         self.db.update_app_config(config)
+
 
 if __name__ == '__main__':
     unittest.main()
