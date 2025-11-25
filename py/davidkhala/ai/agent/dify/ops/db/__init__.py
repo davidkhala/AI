@@ -40,7 +40,7 @@ class DB(Postgres):
             session.add(record)
             session.commit()
             if refresh:
-                session.refresh(record)  # 刷新对象，确保拿到数据库生成的字段（如 id）
+                session.refresh(record)
                 return record
             return None
 
