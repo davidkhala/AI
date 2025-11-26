@@ -14,7 +14,8 @@ select * from app_model_configs;
 select * from dataset_queries where source = 'app' and created_by_role = 'end_user';
 -- chunk hit count
 select dataset_id, document_id, hit_count from document_segments;
-
+-- child chunk (Parent Child mode)
+select dataset_id, document_id, segment_id, position, content from child_chunks;
 
 -- user feedback
 SELECT

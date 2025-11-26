@@ -4,7 +4,7 @@ import unittest
 from davidkhala.utils.syntax.path import resolve
 from requests import HTTPError
 
-from davidkhala.ai.agent.dify.api.knowledge import Dataset, Document
+from davidkhala.ai.agent.dify.api.knowledge import Dataset, Document, Chunk
 
 
 class CloudTest(unittest.TestCase):
@@ -92,6 +92,13 @@ class DocumentTest(CloudTest):
         doc = Document(self.client, doc_id)
         for chunk in doc.list_chunks():
             print(chunk['sign_content'])
+    def test_chunk_get(self):
+        doc_id = 'a9aff11c-f7e5-42fe-84e0-f21b522a68f9'
+        doc = Document(self.client, doc_id)
+        chunk_id = 'aa05539b-052e-4ec2-b8af-2067295423a2'
+        chunk = Chunk(doc, chunk_id)
+        chunk_data = chunk.get()
+        self.assertIn('[![](', chunk_data['content']) # how image, link are stored
 
     def test_del(self):
         doc_id = '6006f9db-4e7b-4760-a5b5-b8894ac8914c'
@@ -128,6 +135,8 @@ class LocalDeploymentTest(unittest.TestCase):
     def setUp(self):
         connection_str = "postgresql://postgres:difyai123456@localhost:5432/dify"
         self.db = DB(connection_str)
+        dataset_id = 'a2c739f4-2c04-4c32-b30b-f2cc517fec86'
+        self.dataset = Dataset.Instance(Dataset('dataset-E1hUZPcn1qLIt8tNI2Klb4SN', 'http://localhost/v1'), dataset_id)
 
     def test_properties(self):
         print(self.db.apps)
