@@ -44,10 +44,21 @@ class DB(Postgres):
                 return record
             return None
 
-    def hit_run(self, top_k: int = 3):
+    def hit_documents(self, top_k: int = 3):
         template = "SELECT dataset_id, document_id, content FROM document_segments ORDER BY hit_count DESC LIMIT :top_k"
         return self.get_dict(template, {'top_k': top_k})
 
     def dataset_queries(self, dataset_id, limit=20) -> list[str]:
         template = "select content from dataset_queries where source = 'app' and created_by_role = 'end_user' and dataset_id = :dataset_id limit :limit"
         return self.query(template, {'dataset_id': dataset_id, 'limit':limit}).scalars().all()
+    def user_feedbacks(self):
+        sql = """
+                   SELECT mf.conversation_id,
+                          mf.content,
+                          m.query,
+                          m.answer
+                   FROM message_feedbacks mf
+                            LEFT JOIN messages m ON mf.message_id = m.id
+                   WHERE mf.from_source = 'user' \
+                   """
+        return self.get_dict(sql)

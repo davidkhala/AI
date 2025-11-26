@@ -132,7 +132,8 @@ class LocalDeploymentTest(unittest.TestCase):
     def test_properties(self):
         print(self.db.apps)
         print(self.db.accounts)
-
+    def test_user_feedbacks(self):
+        print(self.db.user_feedbacks())
     def test_generate_conversation_opener(self):
         from davidkhala.ai.openrouter import Client
         # config
@@ -145,7 +146,7 @@ class LocalDeploymentTest(unittest.TestCase):
         self.assertIsNotNone(config)
         print('current suggested_questions', config.suggested_questions)
         new_questions = []
-        for d in self.db.hit_run(question_size):
+        for d in self.db.hit_documents(question_size):
             dataset_id = d['dataset_id']
             document_id = d['document_id']
             content = d['content']

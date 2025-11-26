@@ -24,5 +24,7 @@ SELECT
     m.message  -- conversation context
 FROM message_feedbacks mf
 LEFT JOIN messages m
-    ON mf.message_id = m.id;
+    ON mf.message_id = m.id
+WHERE mf.from_source = 'user'
+;
 
