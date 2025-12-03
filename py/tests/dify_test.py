@@ -175,7 +175,15 @@ class LocalDeploymentTest(unittest.TestCase):
             new_questions.append(choices[0].strip())
         config.suggested_questions = json.dumps(new_questions)
         self.db.update_app_config(config)
-
+    def test_console(self):
+        from davidkhala.ai.agent.dify.ops.console.knowledge import ConsoleKnowledge
+        dataset ="a2c739f4-2c04-4c32-b30b-f2cc517fec86"
+        document = "39af20d0-4f5d-4ab5-947e-32b188f6f298"
+        kb = ConsoleKnowledge()
+        csrf_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjQ2NzI2NDIsInN1YiI6Ijk0Nzg1ZjE0LTY5ODMtNGE3Zi05NThmLWJkOGI5YWRiODYxNSJ9.iRASGa4mUXJ9U7lIAaQWr5x_fG-C5m_fhKzxMR3CRFc"
+        kb.options['headers']['Cookie'] = f"csrf_token={csrf_token};access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOTQ3ODVmMTQtNjk4My00YTdmLTk1OGYtYmQ4YjlhZGI4NjE1IiwiZXhwIjoxNzY0NjcyNjQyLCJpc3MiOiJTRUxGX0hPU1RFRCIsInN1YiI6IkNvbnNvbGUgQVBJIFBhc3Nwb3J0In0.azw2w8aSPs2YUomZHEGpMSYQWv_6EAnmu1w0XJyZfKQ;"
+        kb.options['headers']['x-csrf-token'] = csrf_token
+        kb.website_sync(dataset, document)
 
 if __name__ == '__main__':
     unittest.main()
