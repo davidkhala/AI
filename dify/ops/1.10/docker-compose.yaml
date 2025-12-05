@@ -358,8 +358,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
-      api:
-        condition: service_started
     volumes:
       # Mount the storage directory to the container, for storing user files.
       - dify-app-storage:/app/api/storage

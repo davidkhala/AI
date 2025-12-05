@@ -5,7 +5,7 @@ from davidkhala.utils.syntax.path import resolve
 from requests import HTTPError
 
 from davidkhala.ai.agent.dify.api.knowledge import Dataset, Document, Chunk
-
+from davidkhala.ai.agent.dify.ops.db.orm import Graph
 
 class CloudTest(unittest.TestCase):
     def setUp(self):
@@ -127,20 +127,24 @@ class ChatAppTest(unittest.TestCase):
 
 
 from davidkhala.ai.agent.dify.ops.db import DB
+from davidkhala.ai.agent.dify.ops.db.app import Studio
+from davidkhala.ai.agent.dify.ops.db.sys import Info
+from davidkhala.ai.agent.dify.ops.db.knowledge import Dataset
 import json
-
+from davidkhala.ai.agent.dify.ops.console.session import ConsoleUser
+from davidkhala.ai.agent.dify.ops.console.knowledge import ConsoleKnowledge
 
 @unittest.skipIf(os.getenv('CI'), "open source deployment only")
 class LocalDeploymentTest(unittest.TestCase):
     def setUp(self):
-        connection_str = "postgresql://postgres:difyai123456@localhost:5432/dify"
-        self.db = DB(connection_str)
-
+        self.connection_str = "postgresql://postgres:difyai123456@localhost:5432/dify"
+        self.app = Studio(self.connection_str)
+        self.kb = Dataset(self.connection_str)
     def test_properties(self):
-        print(self.db.apps)
-        print(self.db.accounts)
+        print(self.app.apps)
+        print(Info(self.connection_str).accounts)
     def test_user_feedbacks(self):
-        print(self.db.user_feedbacks())
+        print(self.app.user_feedbacks)
     def test_generate_conversation_opener(self):
         from davidkhala.ai.openrouter import Client
         # config
@@ -149,15 +153,15 @@ class LocalDeploymentTest(unittest.TestCase):
         api_key = os.environ.get('OPENROUTER_API_KEY')
         self.openrouter = Client(api_key)
         self.openrouter.as_chat('minimax/minimax-m2')
-        config = self.db.app_config(app_id)
+        config = self.app.app_config(app_id)
         self.assertIsNotNone(config)
         print('current suggested_questions', config.suggested_questions)
         new_questions = []
-        for d in self.db.hit_documents(question_size):
+        for d in self.kb.hit_documents(question_size):
             dataset_id = d['dataset_id']
             document_id = d['document_id']
             content = d['content']
-            questions = self.db.dataset_queries(dataset_id)
+            questions = self.kb.dataset_queries(dataset_id)
             prompt = f"""
             Based on below knowledge base document content, generate single question that user may ask against the content. 
             Don't assume user have document content as prior knowledge.
@@ -172,19 +176,33 @@ class LocalDeploymentTest(unittest.TestCase):
             choices = self.openrouter.chat(prompt)
             new_questions.append(choices[0].strip())
         config.suggested_questions = json.dumps(new_questions)
-        self.db.update_app_config(config)
+        self.app.update_app_config(config)
 
     def test_console_sync(self):
-        from davidkhala.ai.agent.dify.ops.console.session import ConsoleUser
-        from davidkhala.ai.agent.dify.ops.console.knowledge import ConsoleKnowledge
+
         console = ConsoleUser()
         cookies = console.login("david-khala@hotmail.com","davidkhala2025")
         kb = ConsoleKnowledge(cookies)
         doc_source = 'https://thei.edu.hk/departments/department-of-construction-environment-and-engineering/professional-diploma-meister-power-electrical-engineering/'
         dataset = "a2c739f4-2c04-4c32-b30b-f2cc517fec86"
-        ids = self.db.document_by(doc_source)
+        ids = self.kb.document_by(doc_source)
         assert len(ids) == 1
         document = ids[0]
         kb.website_sync(dataset, document)
+    def test_console_pipeline(self):
+        pipelines = self.kb.pipelines
+        console = ConsoleUser()
+        cookies = console.login("david-khala@hotmail.com", "davidkhala2025")
+        kb = ConsoleKnowledge(cookies)
+
+        for p in pipelines:
+            nodes= p['graph'].datasources
+            nodeid = nodes[0].id
+            kb.run(p['id'], nodeid, inputs={
+                # TODO WIP
+            })
+
+
+
 if __name__ == '__main__':
     unittest.main()
