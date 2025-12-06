@@ -19,7 +19,7 @@ class Dataset(DB):
     @property
     def pipelines(self):
         """unique syntax for pgsql"""
-        template = "SELECT DISTINCT ON (app_id) id, graph, rag_pipeline_variables FROM workflows where type = 'rag-pipeline' ORDER BY app_id, created_at DESC"
+        template = "SELECT DISTINCT ON (app_id) app_id, graph, rag_pipeline_variables FROM workflows where type = 'rag-pipeline' ORDER BY app_id, created_at DESC"
         return Graph.convert(*self.get_dict(template))
 
     def pipeline(self, app_id):

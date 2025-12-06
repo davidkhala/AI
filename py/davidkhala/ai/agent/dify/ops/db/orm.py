@@ -68,7 +68,7 @@ class NodeData(BaseModel):
         CHUNKER = 'knowledge-index'
         TOOL = 'tool'
 
-    type: Type
+    type: Type | str  # not limit to built-in types
     title: str | None = None
     selected: bool
 
@@ -106,6 +106,8 @@ class NodeData(BaseModel):
 
 
 class Node(BaseModel):
+    @property
+    def datasource_type(self): return self.data.provider_type
     id: str
     type: Literal['custom']
     data: NodeData

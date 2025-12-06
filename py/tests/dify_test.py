@@ -7,6 +7,7 @@ from requests import HTTPError
 from davidkhala.ai.agent.dify.api.knowledge import Dataset, Document, Chunk
 from davidkhala.ai.agent.dify.ops.db.orm import Graph
 
+
 class CloudTest(unittest.TestCase):
     def setUp(self):
         self.api_key = os.getenv('KB_API_KEY')
@@ -92,13 +93,14 @@ class DocumentTest(CloudTest):
         doc = Document(self.client, doc_id)
         for chunk in doc.list_chunks():
             print(chunk['sign_content'])
+
     def test_chunk_get(self):
         doc_id = 'a9aff11c-f7e5-42fe-84e0-f21b522a68f9'
         doc = Document(self.client, doc_id)
         chunk_id = 'aa05539b-052e-4ec2-b8af-2067295423a2'
         chunk = Chunk(doc, chunk_id)
         chunk_data = chunk.get()
-        self.assertIn('[![](', chunk_data['content']) # how image, link are stored
+        self.assertIn('[![](', chunk_data['content'])  # how image, link are stored
 
     def test_del(self):
         doc_id = '6006f9db-4e7b-4760-a5b5-b8894ac8914c'
@@ -132,7 +134,8 @@ from davidkhala.ai.agent.dify.ops.db.sys import Info
 from davidkhala.ai.agent.dify.ops.db.knowledge import Dataset
 import json
 from davidkhala.ai.agent.dify.ops.console.session import ConsoleUser
-from davidkhala.ai.agent.dify.ops.console.knowledge import ConsoleKnowledge
+from davidkhala.ai.agent.dify.ops.console.knowledge import Datasource, Operation, Load
+
 
 @unittest.skipIf(os.getenv('CI'), "open source deployment only")
 class LocalDeploymentTest(unittest.TestCase):
@@ -140,11 +143,14 @@ class LocalDeploymentTest(unittest.TestCase):
         self.connection_str = "postgresql://postgres:difyai123456@localhost:5432/dify"
         self.app = Studio(self.connection_str)
         self.kb = Dataset(self.connection_str)
+
     def test_properties(self):
         print(self.app.apps)
         print(Info(self.connection_str).accounts)
+
     def test_user_feedbacks(self):
         print(self.app.user_feedbacks)
+
     def test_generate_conversation_opener(self):
         from davidkhala.ai.openrouter import Client
         # config
@@ -181,27 +187,39 @@ class LocalDeploymentTest(unittest.TestCase):
     def test_console_sync(self):
 
         console = ConsoleUser()
-        cookies = console.login("david-khala@hotmail.com","davidkhala2025")
-        kb = ConsoleKnowledge(cookies)
-        doc_source = 'https://thei.edu.hk/departments/department-of-construction-environment-and-engineering/professional-diploma-meister-power-electrical-engineering/'
-        dataset = "a2c739f4-2c04-4c32-b30b-f2cc517fec86"
+        cookies = console.login("david-khala@hotmail.com", "davidkhala2025")
+        kb = Operation(cookies)
+        doc_source = 'About THEi - Technological and Higher Education Institute of Hong Kong'
+        dataset = "5be5a7b0-b725-40e7-a4e8-4ed953ef054e"
         ids = self.kb.document_by(doc_source)
         assert len(ids) == 1
         document = ids[0]
         kb.website_sync(dataset, document)
+
+    def test_pipeline(self):
+        pipelines = self.kb.pipelines
+        for p in pipelines:
+            for source in p['graph'].datasources:
+                print(source.datasource_type)
+
     def test_console_pipeline(self):
         pipelines = self.kb.pipelines
         console = ConsoleUser()
         cookies = console.login("david-khala@hotmail.com", "davidkhala2025")
-        kb = ConsoleKnowledge(cookies)
+        kb = Datasource(cookies)
+        ids = self.kb.credential_id_by("public", "firecrawl")
+        credential_id = str(ids[0])
+        self.assertEqual(len(pipelines), 1)
+        p = pipelines[0]
+        # http://localhost/console/api/rag/pipelines/019aed67-fc87-76da-bf98-29d035fe2e80/workflows/published/datasource/nodes/1764919615597/run
+        nodes = p['graph'].datasources
+        nodeid = nodes[0].id
 
-        for p in pipelines:
-            nodes= p['graph'].datasources
-            nodeid = nodes[0].id
-            kb.run(p['id'], nodeid, inputs={
-                # TODO WIP
-            })
-
+        kb.run_firecrawl(p['app_id'], nodeid, inputs={
+                "url": "https://thei.edu.hk/about/about-thei/",
+                "subpage": False,
+                "pages": 1
+        }, credential_id=credential_id)
 
 
 if __name__ == '__main__':
