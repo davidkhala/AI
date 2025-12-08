@@ -17,18 +17,18 @@ class ConsoleKnowledge(API):
         super().__init__(base_url)
         self.session.cookies = cookies
 
+
 class Datasource(ConsoleKnowledge):
     """step 1: Choose a Data Source"""
 
     class FirecrawlOutput(BaseModel):
-        source_url:str
-        description:str
-        title:str
-        credential_id:str
-        content:str
+        source_url: str
+        description: str
+        title: str
+        credential_id: str
+        content: str
 
-
-    def run_firecrawl(self, pipeline, node:Node,
+    def run_firecrawl(self, pipeline: str, node: Node,
                       *,
                       inputs: dict,
                       credential_id: str
@@ -55,6 +55,7 @@ class Datasource(ConsoleKnowledge):
                     assert event == 'datasource_processing'
                     print(data)
         return None
+
     def upload(self):
         "http://localhost/console/api/files/upload?source=datasets"
         # TODO
@@ -72,6 +73,7 @@ class Datasource(ConsoleKnowledge):
             "created_at": 1764943811,
             "source_url": "\/files\/3898db5b-eb72-4f11-b507-628ad5d28887\/file-preview?timestamp=1764943811&nonce=43b0ff5a13372415be79de4cc7ef398c&sign=7OJ2wiVYc4tygl7yvM1sPn7s0WXDlhHxgX76bsGTD94%3D"
         }
+
 
 class Operation(ConsoleKnowledge):
     def website_sync(self, dataset, document, *, wait_until=True):
@@ -92,18 +94,21 @@ class Operation(ConsoleKnowledge):
             if status == IndexingStatus.FAILED: raise IndexingError(r['error'])
             return r
         return None
+
+
 class Load(ConsoleKnowledge):
     """
     Processing Documents
     """
-    def run(self, pipeline,node:Node, inputs:dict,datasource_info_list: list[dict]):
+
+    def run(self, pipeline: str, node: Node, inputs: dict, datasource_info_list: list[dict]):
         # TODO test
         url = f"{self.base_url}/rag/pipelines/{pipeline}/workflows/published/run"
-        self.request(url, "POST", json= {
-            'inputs':inputs,
+        return self.request(url, "POST", json={
+            'inputs': inputs,
             'start_node_id': node.id,
-            'is_preview':False,
-            'response_mode':"blocking",
-            "datasource_info_list":datasource_info_list,
-            'datasource_type':node.datasource_type
+            'is_preview': False,
+            'response_mode': "blocking",
+            "datasource_info_list": datasource_info_list,
+            'datasource_type': node.datasource_type
         })

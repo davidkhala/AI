@@ -2,7 +2,7 @@ from davidkhala.ai.agent.dify.plugins import AbstractDataSource
 
 
 class DataSourceOutput(AbstractDataSource):
-    datasource_type = "website_crawl"
+    datasource_type:str = "website_crawl"
     source_url: str
     description: str
     title: str
@@ -10,4 +10,4 @@ class DataSourceOutput(AbstractDataSource):
 
 
 class Console(DataSourceOutput):
-    credential_id: str
+    credential_id: str|None

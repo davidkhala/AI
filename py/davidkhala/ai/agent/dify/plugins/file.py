@@ -15,5 +15,5 @@ class FileModel(BaseModel):
 
 
 class DataSourceOutput(AbstractDataSource):
-    datasource_type = "local_file"
+    datasource_type:str = "local_file"
     file: FileModel

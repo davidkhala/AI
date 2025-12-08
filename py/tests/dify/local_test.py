@@ -3,7 +3,7 @@ import os
 import unittest
 
 from davidkhala.ai.agent.dify.common import IndexingError
-from davidkhala.ai.agent.dify.ops.console.knowledge import Datasource, Operation
+from davidkhala.ai.agent.dify.ops.console.knowledge import Datasource, Operation, Load
 from davidkhala.ai.agent.dify.ops.console.session import ConsoleUser
 from davidkhala.ai.agent.dify.ops.db.app import Studio
 from davidkhala.ai.agent.dify.ops.db.knowledge import Dataset, Document, Pipeline
@@ -21,8 +21,10 @@ class DBTest(unittest.TestCase):
     def test_properties(self):
         print(self.app.apps)
         print(self.info.accounts)
+
     def test_user_feedbacks(self):
         print(self.app.user_feedbacks)
+
     def test_generate_conversation_opener(self):
         from davidkhala.ai.openrouter import Client
         # config
@@ -54,17 +56,20 @@ class DBTest(unittest.TestCase):
             new_questions.append(choices[0].strip())
         config.suggested_questions = json.dumps(new_questions)
         self.app.update_app_config(config)
+
+
 class ConsoleTest(unittest.TestCase):
     def setUp(self):
         console = ConsoleUser()
         self.cookies = console.login("david-khala@hotmail.com", "davidkhala2025")
         self.connection_str = "postgresql://postgres:difyai123456@localhost:5432/dify"
+
     def test_console_sync(self):
 
         console_ops = Operation(self.cookies)
         doc_source = 'Home - Technological and Higher Education Institute of Hong Kong'
         dataset = "5be5a7b0-b725-40e7-a4e8-4ed953ef054e"
-        db_doc =  Document(self.connection_str)
+        db_doc = Document(self.connection_str)
         ids = db_doc.id_by(doc_source)
         assert len(ids) == 1
         document = ids[0]
@@ -87,18 +92,28 @@ class ConsoleTest(unittest.TestCase):
         credential_id = str(ids[0])
         self.assertEqual(len(pipelines), 1)
         p = pipelines[0]
-        # http://localhost/console/api/rag/pipelines/019aed67-fc87-76da-bf98-29d035fe2e80/workflows/published/datasource/nodes/1764919615597/run
         nodes = p['graph'].datasources
-        node= nodes[0]
+        p_id = p['app_id']
+        node = nodes[0]
 
-        kb.run_firecrawl(p['app_id'], node, inputs={
-            "url": "https://thei.edu.hk/about/about-thei/",
+        sources_r = kb.run_firecrawl(p_id, node, inputs={
+            "url": "https://thei.edu.hk/",
             "subpage": False,
             "pages": 1
         }, credential_id=credential_id)
+        load = Load(self.cookies)
+        from davidkhala.ai.agent.dify.plugins.firecrawl import Console
+        for source in sources_r:
+            source['credential_id'] = credential_id
+            Console(**source)  # schema validation
+
+            run_r = load.run(p_id, node, inputs={
+                'child_length': 24
+            }, datasource_info_list=[source])
+            # TODO requests.exceptions.HTTPError: 401 Client Error: UNAUTHORIZED
+            print(run_r)
 
 
 if __name__ == '__main__':
     if not os.getenv('CI'):
         unittest.main()
-
