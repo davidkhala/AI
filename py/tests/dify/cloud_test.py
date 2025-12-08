@@ -1,11 +1,13 @@
+
 import os
 import unittest
+from datetime import datetime
 
 from davidkhala.utils.syntax.path import resolve
 from requests import HTTPError
 
+from davidkhala.ai.agent.dify.api.app import Feedbacks, Conversation
 from davidkhala.ai.agent.dify.api.knowledge import Dataset, Document, Chunk
-from davidkhala.ai.agent.dify.ops.db.orm import Graph
 
 
 class CloudTest(unittest.TestCase):
@@ -45,17 +47,13 @@ class DocumentTest(CloudTest):
         # doc_id = r['id']
         # r = self.client.upload(None, url=url,document_id=doc_id)
         # print(r)
-        from datetime import datetime
+
         composite_file = f"{datetime.now().strftime("%Y%m%d_%H%M%S")}.README.md"
         r = self.client.upload(composite_file, url=url)
 
     def test_upload_pdf(self):
         pdf_path = resolve(__file__, '../fixtures/empty.pdf')
         self.client.upload(None, path=pdf_path)
-
-    def test_update(self):
-        ...  # FIXME cannot rename
-        # TODO try update content of README.md
 
     def test_unsupported_upload(self):
         # png is not supported
@@ -108,7 +106,7 @@ class DocumentTest(CloudTest):
         doc.delete()
 
 
-from davidkhala.ai.agent.dify.api.app import Feedbacks, Conversation
+
 
 
 class ChatAppTest(unittest.TestCase):
@@ -128,98 +126,6 @@ class ChatAppTest(unittest.TestCase):
         self.assertEqual(context.exception.response.status_code, 404)  # security isolation
 
 
-from davidkhala.ai.agent.dify.ops.db import DB
-from davidkhala.ai.agent.dify.ops.db.app import Studio
-from davidkhala.ai.agent.dify.ops.db.sys import Info
-from davidkhala.ai.agent.dify.ops.db.knowledge import Dataset
-import json
-from davidkhala.ai.agent.dify.ops.console.session import ConsoleUser
-from davidkhala.ai.agent.dify.ops.console.knowledge import Datasource, Operation, Load
-
-
-@unittest.skipIf(os.getenv('CI'), "open source deployment only")
-class LocalDeploymentTest(unittest.TestCase):
-    def setUp(self):
-        self.connection_str = "postgresql://postgres:difyai123456@localhost:5432/dify"
-        self.app = Studio(self.connection_str)
-        self.kb = Dataset(self.connection_str)
-
-    def test_properties(self):
-        print(self.app.apps)
-        print(Info(self.connection_str).accounts)
-
-    def test_user_feedbacks(self):
-        print(self.app.user_feedbacks)
-
-    def test_generate_conversation_opener(self):
-        from davidkhala.ai.openrouter import Client
-        # config
-        app_id = '4f3c212a-0dc8-4405-97ca-22914c79a21e'
-        question_size = 3
-        api_key = os.environ.get('OPENROUTER_API_KEY')
-        self.openrouter = Client(api_key)
-        self.openrouter.as_chat('minimax/minimax-m2')
-        config = self.app.app_config(app_id)
-        self.assertIsNotNone(config)
-        print('current suggested_questions', config.suggested_questions)
-        new_questions = []
-        for d in self.kb.hit_documents(question_size):
-            dataset_id = d['dataset_id']
-            document_id = d['document_id']
-            content = d['content']
-            questions = self.kb.dataset_queries(dataset_id)
-            prompt = f"""
-            Based on below knowledge base document content, generate single question that user may ask against the content. 
-            Don't assume user have document content as prior knowledge.
-            You should learn and follow language style from sample questions listed below. And you respond generated question text only
-            
-            sample questions:
-            {questions}  
-            
-            document content is:
-            {content}
-            """
-            choices = self.openrouter.chat(prompt)
-            new_questions.append(choices[0].strip())
-        config.suggested_questions = json.dumps(new_questions)
-        self.app.update_app_config(config)
-
-    def test_console_sync(self):
-
-        console = ConsoleUser()
-        cookies = console.login("david-khala@hotmail.com", "davidkhala2025")
-        kb = Operation(cookies)
-        doc_source = 'About THEi - Technological and Higher Education Institute of Hong Kong'
-        dataset = "5be5a7b0-b725-40e7-a4e8-4ed953ef054e"
-        ids = self.kb.document_by(doc_source)
-        assert len(ids) == 1
-        document = ids[0]
-        kb.website_sync(dataset, document)
-
-    def test_pipeline(self):
-        pipelines = self.kb.pipelines
-        for p in pipelines:
-            for source in p['graph'].datasources:
-                print(source.datasource_type)
-
-    def test_console_pipeline(self):
-        pipelines = self.kb.pipelines
-        console = ConsoleUser()
-        cookies = console.login("david-khala@hotmail.com", "davidkhala2025")
-        kb = Datasource(cookies)
-        ids = self.kb.credential_id_by("public", "firecrawl")
-        credential_id = str(ids[0])
-        self.assertEqual(len(pipelines), 1)
-        p = pipelines[0]
-        # http://localhost/console/api/rag/pipelines/019aed67-fc87-76da-bf98-29d035fe2e80/workflows/published/datasource/nodes/1764919615597/run
-        nodes = p['graph'].datasources
-        nodeid = nodes[0].id
-
-        kb.run_firecrawl(p['app_id'], nodeid, inputs={
-                "url": "https://thei.edu.hk/about/about-thei/",
-                "subpage": False,
-                "pages": 1
-        }, credential_id=credential_id)
 
 
 if __name__ == '__main__':

@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import BaseModel
 
 class JsonEntry(BaseModel):
@@ -8,3 +10,5 @@ class Output(BaseModel):
     text: str
     files: list
     json: list[JsonEntry]
+class AbstractDataSource(BaseModel):
+    datasource_type: Literal["local_file", "online_document", "website_crawl"]

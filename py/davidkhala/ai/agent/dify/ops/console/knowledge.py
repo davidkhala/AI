@@ -5,7 +5,7 @@ from typing import TypedDict
 from pydantic import BaseModel
 from requests.cookies import RequestsCookieJar
 
-from davidkhala.ai.agent.dify.common import IndexingStatus
+from davidkhala.ai.agent.dify.common import IndexingStatus, IndexingError
 from davidkhala.ai.agent.dify.ops.console import API
 from davidkhala.ai.agent.dify.ops.db.orm import Node
 
@@ -48,9 +48,9 @@ class Datasource(ConsoleKnowledge):
             if line:
                 assert type(line) is bytes
                 data = json.loads(line.decode()[6:])
-                event, body = data['event'], data['data']
+                event = data['event']
                 if event == 'datasource_completed':
-                    return body
+                    return data['data']
                 else:
                     assert event == 'datasource_processing'
                     print(data)
@@ -89,7 +89,7 @@ class Operation(ConsoleKnowledge):
                 sleep(1)
                 r = self.request(f"{doc_url}/indexing-status", "GET")
                 status = r['indexing_status']
-            if status == IndexingStatus.FAILED: raise Exception(r['error'])
+            if status == IndexingStatus.FAILED: raise IndexingError(r['error'])
             return r
         return None
 class Load(ConsoleKnowledge):
@@ -97,7 +97,7 @@ class Load(ConsoleKnowledge):
     Processing Documents
     """
     def run(self, pipeline,node:Node, inputs:dict,datasource_info_list: list[dict]):
-
+        # TODO test
         url = f"{self.base_url}/rag/pipelines/{pipeline}/workflows/published/run"
         self.request(url, "POST", json= {
             'inputs':inputs,
