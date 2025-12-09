@@ -70,7 +70,7 @@ class DocumentTest(CloudTest):
 
     def test_list(self):
         for doc in self.client.list_documents():
-            # doc has content, can be length
+            # doc has content, can be lengthy
             print(doc['name'])
 
     def test_has(self):
@@ -105,10 +105,6 @@ class DocumentTest(CloudTest):
         doc = Document(self.client, doc_id)
         doc.delete()
 
-
-
-
-
 class ChatAppTest(unittest.TestCase):
     api_key = os.getenv('APP_API_KEY')
 
@@ -118,13 +114,15 @@ class ChatAppTest(unittest.TestCase):
             print(feedback['content'])
 
     def test_messages(self):
-        user = '999196d8-0842-4617-adcf-aa46e0808404'
-        conversation_id = 'f96b5cfc-7006-4afe-b8fe-e0e04374d40f'
-        c = Conversation(self.api_key, user)
+        c = Conversation(self.api_key, '999196d8-0842-4617-adcf-aa46e0808404')
         with self.assertRaises(HTTPError) as context:
-            c.paginate_messages(conversation_id)
+            c.paginate_messages('f96b5cfc-7006-4afe-b8fe-e0e04374d40f')
         self.assertEqual(context.exception.response.status_code, 404)  # security isolation
 
+    def test_chat(self):
+        me = '45bdc865-6d71-40ab-8892-af53906362fa'
+        c = Conversation(self.api_key, me)
+        c.async_chat("What are the specs of the iPhone 13 Pro Max?")
 
 
 

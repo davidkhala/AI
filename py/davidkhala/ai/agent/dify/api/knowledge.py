@@ -91,9 +91,8 @@ class Dataset(API):
 
         def upload(self, filename, *, path=None, url=None, document_id=None):
             """
-            don't work for html
-            work for markdown
-            TODO how to simulate console
+            don't work for .html
+            work for .md
             """
             files = {}
             if path:

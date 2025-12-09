@@ -1,2 +1,2 @@
-web_sync cannot be used on a pipeline kb
-- you will see error
+- web_sync cannot be used on a pipeline kb
+- no way to set/reset password if you account is federated to social login   

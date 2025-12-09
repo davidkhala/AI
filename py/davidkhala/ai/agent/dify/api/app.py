@@ -1,5 +1,5 @@
 import json
-
+from davidkhala.utils.http_request.stream import Request as StreamRequest, as_sse
 import requests
 
 from davidkhala.ai.agent.dify.api import API
@@ -11,6 +11,7 @@ class Feedbacks(API):
         when 'rating'='like', content=None
         when 'rating'='dislike', content can be filled by end user
         NOTE: for security reason, api cannot access conversation context associated with the feedback. End user should copy the conversation to comment by themselves.
+        # waiting for https://github.com/langgenius/dify/issues/28067
         """
         response = requests.get(f"{self.base_url}/app/feedbacks", params={"page": page, "limit": size}, **self.options)
         if not response.ok:
@@ -19,16 +20,17 @@ class Feedbacks(API):
             return json.loads(response.text)
 
     def list_feedbacks(self):
-        # TODO https://github.com/langgenius/dify/issues/28067
         return self.paginate_feedbacks()['data']
+
 
 class Conversation(API):
     """
     Note: The Service API does not share conversations created by the WebApp. Conversations created through the API are isolated from those created in the WebApp interface.
     It means you cannot get user conversation content from API, API call has only access to conversation created by API
     """
+
     def __init__(self, api_key: str, user: str):
-        super().__init__(api_key) # base_url need to be configured afterward if not default
+        super().__init__(api_key)  # base_url need to be configured afterward if not default
         self.user = user  # user_id, from_end_user_id
 
     def paginate_messages(self, conversation_id):
@@ -36,3 +38,21 @@ class Conversation(API):
             'conversation_id': conversation_id,
             'user': self.user,
         })
+
+    def async_chat(self, template: str,
+                   previous_conversation_id: str = None, *, values: dict = None, files: list = None
+                   ):
+        """
+        Note: "Agent Chat App does not support blocking mode"
+        """
+        s = StreamRequest(self)
+        response = s.request(f"{self.base_url}/chat-messages", "POST", json={
+            'query': template,
+            'inputs': values,
+            'response_mode': 'streaming',
+            'conversation_id': previous_conversation_id,
+            'user': self.user,
+            'files': files
+        })
+        for data in as_sse(response):
+            print(data)

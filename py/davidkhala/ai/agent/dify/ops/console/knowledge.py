@@ -1,7 +1,6 @@
-import json
 from time import sleep
-from typing import TypedDict
 
+from davidkhala.utils.http_request.stream import as_sse
 from pydantic import BaseModel
 from requests.cookies import RequestsCookieJar
 
@@ -44,16 +43,14 @@ class Datasource(ConsoleKnowledge):
         }, headers={
             'x-csrf-token': self.session.cookies.get("csrf_token")
         })
-        for line in response.iter_lines():
-            if line:
-                assert type(line) is bytes
-                data = json.loads(line.decode()[6:])
-                event = data['event']
-                if event == 'datasource_completed':
-                    return data['data']
-                else:
-                    assert event == 'datasource_processing'
-                    print(data)
+        # TODO still ugly on add-hoc
+        for data in as_sse(response):
+            event = data['event']
+            if event == 'datasource_completed':
+                return data['data']
+            else:
+                assert event == 'datasource_processing'
+                print(data)
         return None
 
     def upload(self):
@@ -81,7 +78,6 @@ class Operation(ConsoleKnowledge):
         cannot be used towards a pipeline dataset. Otherwise, you will see error "no website import info found"
         """
         doc_url = f"{self.base_url}/datasets/{dataset}/documents/{document}"
-        self.options['headers']['x-csrf-token'] = self.session.cookies.get("csrf_token")
 
         r = self.request(f"{doc_url}/website-sync", "GET")
         assert r == {"result": "success"}

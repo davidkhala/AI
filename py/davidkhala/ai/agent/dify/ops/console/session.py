@@ -16,4 +16,12 @@ class ConsoleUser(API):
             'language': language,
         })
         assert r == {"result": "success"}
+        self.options['headers']['x-csrf-token'] = self.session.cookies.get("csrf_token")
         return self.session.cookies
+    def me(self):
+        url = f"{self.base_url}/profile"
+        return self.request(url, "GET")
+    @property
+    def workspace(self):
+        url = f"{self.base_url}/features"
+        return self.request(url, "GET")

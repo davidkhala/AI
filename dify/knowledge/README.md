@@ -41,3 +41,5 @@ Native Data source
 provision only
 - Notion and website data source cannot be used after provision.
   - solution:　convert this dataset to pipeline mode 
+
+Text search bar for finding a document is case-sensitive to your query  
