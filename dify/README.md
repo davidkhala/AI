@@ -15,6 +15,8 @@ Professional
 - $59 per workspace/month
 - up to 50 apps
 - Unlimited API rate
+- `Documents Upload Quota`: 500
+  - upload request limit, not document total count limit 
 
 # Limit
 No integration with
