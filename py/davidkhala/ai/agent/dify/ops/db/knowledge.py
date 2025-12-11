@@ -1,6 +1,6 @@
-
 from davidkhala.ai.agent.dify.ops.db import DB
 from davidkhala.ai.agent.dify.ops.db.orm import Graph
+
 
 class Dataset(DB):
 
@@ -12,27 +12,32 @@ class Dataset(DB):
     def datasets(self):
         template = "select id, name, description, indexing_technique, index_struct, embedding_model, embedding_model_provider, collection_binding_id, retrieval_model, icon_info, runtime_mode, pipeline_id, chunk_structure from datasets"
         return self.get_dict(template)
-    def is_pipeline(self, id:str):
-        template = "select runtime_mode = 'rag_pipeline' from datasets where id = :id"
-        return self.query(template, {'id':id}).scalar()
 
+    def is_pipeline(self, id: str):
+        template = "select runtime_mode = 'rag_pipeline' from datasets where id = :id"
+        return self.query(template, {'id': id}).scalar()
 
     @property
     def data_source_credentials(self):
         template = "select id, name, plugin_id, auth_type from datasource_providers"
         return self.get_dict(template)
-    def credential_id_by(self, name, provider)-> list[str]:
+
+    def credential_id_by(self, name, provider) -> list[str]:
         template = "select id from datasource_providers where name = :name and provider = :provider"
         return self.query(template, {'name': name, 'provider': provider}).scalars().all()
+
 
 class Document(DB):
     def hit_documents(self, top_k: int = 3):
         template = "SELECT dataset_id, document_id, content FROM document_segments ORDER BY hit_count DESC LIMIT :top_k"
         return self.get_dict(template, {'top_k': top_k})
+
     def id_by(self, name) -> list[str]:
         """multiple ids can be found"""
         template = "select id from documents where name = :name"
-        return self.query(template, {'name': name}).scalars().all()
+        return [str(uuid) for uuid in self.query(template, {'name': name}).scalars().all()]
+
+
 class Pipeline(DB):
     @property
     def pipelines(self):

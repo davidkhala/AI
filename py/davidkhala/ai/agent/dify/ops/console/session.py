@@ -18,10 +18,13 @@ class ConsoleUser(API):
         assert r == {"result": "success"}
         self.options['headers']['x-csrf-token'] = self.session.cookies.get("csrf_token")
         return self.session.cookies
-    def me(self):
-        url = f"{self.base_url}/profile"
-        return self.request(url, "GET")
+
     @property
-    def workspace(self):
+    def me(self) -> dict:
+        url = f"{self.base_url}/account/profile"
+        return self.request(url, "GET")
+
+    @property
+    def workspace(self) -> dict:
         url = f"{self.base_url}/features"
         return self.request(url, "GET")

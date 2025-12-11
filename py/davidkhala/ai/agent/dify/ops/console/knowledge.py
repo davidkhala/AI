@@ -2,19 +2,19 @@ from time import sleep
 
 from davidkhala.utils.http_request.stream import as_sse
 from pydantic import BaseModel
-from requests.cookies import RequestsCookieJar
 
 from davidkhala.ai.agent.dify.common import IndexingStatus, IndexingError
 from davidkhala.ai.agent.dify.ops.console import API
+from davidkhala.ai.agent.dify.ops.console.session import ConsoleUser
 from davidkhala.ai.agent.dify.ops.db.orm import Node
 
 
 class ConsoleKnowledge(API):
-    def __init__(self, cookies: RequestsCookieJar,
-                 *,
-                 base_url='http://localhost'):
-        super().__init__(base_url)
-        self.session.cookies = cookies
+    def __init__(self, context: ConsoleUser):
+        super().__init__()
+        self.base_url = context.base_url
+        self.session.cookies = context.session.cookies
+        self.options = context.options
 
 
 class Datasource(ConsoleKnowledge):
@@ -41,9 +41,9 @@ class Datasource(ConsoleKnowledge):
             'credential_id': credential_id,
             "response_mode": "streaming"
         }, headers={
-            'x-csrf-token': self.session.cookies.get("csrf_token")
+            'x-csrf-token': self.session.cookies.get("csrf_token") # TODO still ugly on add-hoc
         })
-        # TODO still ugly on add-hoc
+
         for data in as_sse(response):
             event = data['event']
             if event == 'datasource_completed':
@@ -73,7 +73,7 @@ class Datasource(ConsoleKnowledge):
 
 
 class Operation(ConsoleKnowledge):
-    def website_sync(self, dataset, document, *, wait_until=True):
+    def website_sync(self, dataset: str, document: str, *, wait_until=True):
         """
         cannot be used towards a pipeline dataset. Otherwise, you will see error "no website import info found"
         """
@@ -82,14 +82,50 @@ class Operation(ConsoleKnowledge):
         r = self.request(f"{doc_url}/website-sync", "GET")
         assert r == {"result": "success"}
         if wait_until:
-            status = None
-            while status not in [IndexingStatus.FAILED, IndexingStatus.COMPLETED]:
-                sleep(1)
-                r = self.request(f"{doc_url}/indexing-status", "GET")
-                status = r['indexing_status']
-            if status == IndexingStatus.FAILED: raise IndexingError(r['error'])
-            return r
+            return self.wait_until(dataset, document)
         return None
+
+    def retry(self, dataset: str, *documents: str, wait_until=True):
+        """
+        It cannot trigger rerun on success documents
+        """
+        url = f"{self.base_url}/datasets/{dataset}/retry"
+        self.request(url, "POST", json={
+            'document_ids': documents,
+        })
+        # response status code will be 204
+        if wait_until:
+            return [self.wait_until(dataset, document) for document in documents]
+        return None
+
+    def rerun(self, dataset: str, *documents: str):
+        for document in documents:
+            try:
+                self.website_sync(dataset, document)
+                assert False, "expect IndexingError"
+            except IndexingError:
+                pass
+        return self.retry(dataset, *documents)
+
+    def wait_until(self, dataset: str, document: str, *,
+                   expect=None,
+                   from_status=None,
+                   interval=1
+                   ):
+        if not expect:
+            expect = [IndexingStatus.FAILED, IndexingStatus.COMPLETED]
+        url = f"{self.base_url}/datasets/{dataset}/documents/{document}/indexing-status"
+        if not from_status:
+            from_status = [IndexingStatus.WAITING, IndexingStatus.PARSING]
+        r = self.request(url, "GET")
+        status = r['indexing_status']
+        assert status in from_status, f"current status: {status}, expect: {from_status}"
+        while status not in expect:
+            sleep(interval)
+            r = self.request(url, "GET")
+            status = r['indexing_status']
+        if status == IndexingStatus.FAILED: raise IndexingError(r['error'])
+        return r
 
 
 class Load(ConsoleKnowledge):

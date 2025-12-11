@@ -60,13 +60,16 @@ class DBTest(unittest.TestCase):
 
 class ConsoleTest(unittest.TestCase):
     def setUp(self):
-        console = ConsoleUser()
-        self.cookies = console.login("david-khala@hotmail.com", "davidkhala2025")
+        self.console = ConsoleUser()
+        self.console.login("david-khala@hotmail.com", "davidkhala2025")
         self.connection_str = "postgresql://postgres:difyai123456@localhost:5432/dify"
 
+    def test_user(self):
+        print(self.console.me)
+        print(self.console.workspace)
     def test_console_sync(self):
 
-        console_ops = Operation(self.cookies)
+        console_ops = Operation(self.console)
         doc_source = 'Home - Technological and Higher Education Institute of Hong Kong'
         dataset = "5be5a7b0-b725-40e7-a4e8-4ed953ef054e"
         db_doc = Document(self.connection_str)
@@ -75,7 +78,15 @@ class ConsoleTest(unittest.TestCase):
         document = ids[0]
         with self.assertRaisesRegex(IndexingError, 'no website import info found'):
             console_ops.website_sync(dataset, document)
+    def test_console_rerun(self):
+        console_ops = Operation(self.console)
+        doc_source = 'Home - Technological and Higher Education Institute of Hong Kong'
+        dataset = "5be5a7b0-b725-40e7-a4e8-4ed953ef054e"
+        db_doc = Document(self.connection_str)
+        ids = db_doc.id_by(doc_source)
 
+        returns = console_ops.rerun(dataset, *ids)
+        print(returns)
     def test_pipeline(self):
         db_pipe = Pipeline(self.connection_str)
         pipelines = db_pipe.pipelines
@@ -87,7 +98,7 @@ class ConsoleTest(unittest.TestCase):
         db_pipe = Pipeline(self.connection_str)
         pipelines = db_pipe.pipelines
         db_ds = Dataset(self.connection_str)
-        kb = Datasource(self.cookies)
+        kb = Datasource(self.console)
         ids = db_ds.credential_id_by("public", "firecrawl")
         credential_id = str(ids[0])
         self.assertEqual(len(pipelines), 1)
@@ -101,7 +112,7 @@ class ConsoleTest(unittest.TestCase):
             "subpage": False,
             "pages": 1
         }, credential_id=credential_id)
-        load = Load(self.cookies)
+        load = Load(self.console)
         from davidkhala.ai.agent.dify.plugins.firecrawl import Console
         for source in sources_r:
             source['credential_id'] = credential_id
