@@ -2,7 +2,7 @@ import json
 import os
 import unittest
 
-from davidkhala.ai.agent.dify.common import IndexingError
+from davidkhala.ai.agent.dify.common import IndexingError, IndexingStatus
 from davidkhala.ai.agent.dify.ops.console.knowledge import Datasource, Operation, Load
 from davidkhala.ai.agent.dify.ops.console.session import ConsoleUser
 from davidkhala.ai.agent.dify.ops.db.app import Studio
@@ -99,6 +99,7 @@ class ConsoleTest(unittest.TestCase):
         pipelines = db_pipe.pipelines
         db_ds = Dataset(self.connection_str)
         kb = Datasource(self.console)
+        console_ops = Operation(self.console)
         ids = db_ds.credential_id_by("public", "firecrawl")
         credential_id = str(ids[0])
         self.assertEqual(len(pipelines), 1)
@@ -118,11 +119,14 @@ class ConsoleTest(unittest.TestCase):
             source['credential_id'] = credential_id
             Console(**source)  # schema validation
 
-            run_r = load.run(p_id, node, inputs={
+            run_r = load.async_run(p_id, node, inputs={
                 'child_length': 24
             }, datasource_info_list=[source])
-            # TODO requests.exceptions.HTTPError: 401 Client Error: UNAUTHORIZED
-            print(run_r)
+            # wait until
+            for document in run_r.documents:
+                final = console_ops.wait_until(run_r.dataset.id, document.id, from_status=[IndexingStatus.WAITING, IndexingStatus.PARSING, IndexingStatus.COMPLETED, IndexingStatus.FAILED])
+                print(final)
+
 
 
 if __name__ == '__main__':

@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from davidkhala.ai.agent.dify.plugins import AbstractDataSource
+from davidkhala.ai.agent.dify.plugins import DataSourceTypeAware
 
 
 class FileModel(BaseModel):
@@ -14,6 +14,6 @@ class FileModel(BaseModel):
     related_id: str
 
 
-class DataSourceOutput(AbstractDataSource):
+class DataSourceOutput(DataSourceTypeAware):
     datasource_type:str = "local_file"
     file: FileModel

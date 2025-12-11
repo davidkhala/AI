@@ -1,13 +1,22 @@
-from davidkhala.ai.agent.dify.plugins import AbstractDataSource
+from pydantic import BaseModel
+
+from davidkhala.ai.agent.dify.plugins import DataSourceTypeAware
 
 
-class DataSourceOutput(AbstractDataSource):
-    datasource_type:str = "website_crawl"
+class DataSourceInfo(BaseModel):
     source_url: str
-    description: str
-    title: str
     content: str
+    title: str
+    description: str
 
 
-class Console(DataSourceOutput):
-    credential_id: str|None
+class DataSourceOutput(DataSourceTypeAware, DataSourceInfo):
+    datasource_type: str = "website_crawl"
+
+
+class CredentialAware(BaseModel):
+    credential_id: str | None
+
+
+class Console(DataSourceOutput, CredentialAware):
+    pass

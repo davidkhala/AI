@@ -10,5 +10,5 @@ class Output(BaseModel):
     text: str
     files: list
     json: list[JsonEntry]
-class AbstractDataSource(BaseModel):
+class DataSourceTypeAware(BaseModel):
     datasource_type: Literal["local_file", "online_document", "website_crawl"]

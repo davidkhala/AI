@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 import requests
 
 from davidkhala.ai.agent.dify.api import API, Iterator
-
+from davidkhala.ai.agent.dify.common import Document as DocumentBase
 
 class DatasetDict(TypedDict):
     id: str
@@ -37,21 +37,14 @@ class DatasetDict(TypedDict):
     external_knowledge_info: dict
 
 
-class DocumentDict(TypedDict):
-    id: str
-    position: int
-    data_source_type: str
+class Document(DocumentBase):
     data_source_info: dict[str, str]
     data_source_detail_dict: dict[str, dict]
     dataset_process_rule_id: str
-    name: str
     created_from: str
     created_by: str
     created_at: int
     tokens: int
-    indexing_status: str
-    error: str
-    enabled: bool
     archived: bool
     display_status: str
     word_count: int
@@ -123,10 +116,10 @@ class Dataset(API):
                 'limit': size
             })
 
-        def list_documents(self) -> Iterable[DocumentDict]:
+        def list_documents(self) -> Iterable[Document]:
             for document_batch in Iterator(self.paginate_documents, None):
                 for document in document_batch:
-                    yield document
+                    yield Document(**document)
 
         def has_document(self, name) -> bool:
             return any(name == item['name'] for row in self.list_documents() for item in row)

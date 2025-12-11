@@ -1,9 +1,9 @@
 from time import sleep
 
-from davidkhala.utils.http_request.stream import as_sse
+from davidkhala.utils.http_request.stream import as_sse, Request as StreamRequest
 from pydantic import BaseModel
 
-from davidkhala.ai.agent.dify.common import IndexingStatus, IndexingError
+from davidkhala.ai.agent.dify.common import IndexingStatus, IndexingError, Dataset, Document
 from davidkhala.ai.agent.dify.ops.console import API
 from davidkhala.ai.agent.dify.ops.console.session import ConsoleUser
 from davidkhala.ai.agent.dify.ops.db.orm import Node
@@ -35,13 +35,12 @@ class Datasource(ConsoleKnowledge):
 
         url = f"{self.base_url}/rag/pipelines/{pipeline}/workflows/published/datasource/nodes/{node.id}/run"
 
-        response = self.session.post(url, stream=True, json={
+        stream_request = StreamRequest(self)
+        response = stream_request.request(url, 'POST', json={
             'inputs': inputs,
             'datasource_type': node.datasource_type,
             'credential_id': credential_id,
             "response_mode": "streaming"
-        }, headers={
-            'x-csrf-token': self.session.cookies.get("csrf_token") # TODO still ugly on add-hoc
         })
 
         for data in as_sse(response):
@@ -108,19 +107,19 @@ class Operation(ConsoleKnowledge):
         return self.retry(dataset, *documents)
 
     def wait_until(self, dataset: str, document: str, *,
-                   expect=None,
+                   expect_status=None,
                    from_status=None,
                    interval=1
                    ):
-        if not expect:
-            expect = [IndexingStatus.FAILED, IndexingStatus.COMPLETED]
+        if not expect_status:
+            expect_status = [IndexingStatus.FAILED, IndexingStatus.COMPLETED]
         url = f"{self.base_url}/datasets/{dataset}/documents/{document}/indexing-status"
-        if not from_status:
+        if from_status is None:
             from_status = [IndexingStatus.WAITING, IndexingStatus.PARSING]
         r = self.request(url, "GET")
         status = r['indexing_status']
         assert status in from_status, f"current status: {status}, expect: {from_status}"
-        while status not in expect:
+        while status not in expect_status:
             sleep(interval)
             r = self.request(url, "GET")
             status = r['indexing_status']
@@ -128,15 +127,23 @@ class Operation(ConsoleKnowledge):
         return r
 
 
+class DatasetResult(Dataset):
+    chunk_structure: str
+
+class RunResult(BaseModel):
+    batch: str
+    dataset: DatasetResult
+    documents: list[Document]
+
 class Load(ConsoleKnowledge):
     """
     Processing Documents
     """
 
-    def run(self, pipeline: str, node: Node, inputs: dict, datasource_info_list: list[dict]):
-        # TODO test
+    def async_run(self, pipeline: str, node: Node, inputs: dict, datasource_info_list: list[dict])->RunResult:
+        """Ingest new document"""
         url = f"{self.base_url}/rag/pipelines/{pipeline}/workflows/published/run"
-        return self.request(url, "POST", json={
+        r = self.request(url, "POST", json={
             'inputs': inputs,
             'start_node_id': node.id,
             'is_preview': False,
@@ -144,3 +151,6 @@ class Load(ConsoleKnowledge):
             "datasource_info_list": datasource_info_list,
             'datasource_type': node.datasource_type
         })
+        return RunResult(**r)
+
+
