@@ -11,18 +11,11 @@ type `Paragraph`
 - bug: limit up to 48 length. And not editable
 
 # Documents
-
-max chunk size: < 4000
-chunk overlap: 10%-25% of max chunk size
-
-name is not unique: different documents can have same name
-
-chunk structure
-- Parent-child：适用于精准查找。通过将child chunk尺寸设为关键词长度 
-
 sync
 - sync will rerun the process of embedding
 - overwrite: existing modification on chunks will be lost
+- for general document only
+  - raise error if converted to rag-workflow 
 
 # Dataset 
 Native Data source
@@ -42,4 +35,6 @@ provision only
 - Notion and website data source cannot be used after provision.
   - solution:　convert this dataset to pipeline mode 
 
-Text search bar for finding a document is case-sensitive to your query  
+Text search bar for finding a document is case-sensitive to your query
+
+name is not unique: different documents can have same name

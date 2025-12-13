@@ -67,6 +67,7 @@ class ConsoleTest(unittest.TestCase):
     def test_user(self):
         print(self.console.me)
         print(self.console.workspace)
+
     def test_console_sync(self):
 
         console_ops = Operation(self.console)
@@ -78,6 +79,7 @@ class ConsoleTest(unittest.TestCase):
         document = ids[0]
         with self.assertRaisesRegex(IndexingError, 'no website import info found'):
             console_ops.website_sync(dataset, document)
+
     def test_console_rerun(self):
         console_ops = Operation(self.console)
         doc_source = 'Home - Technological and Higher Education Institute of Hong Kong'
@@ -87,6 +89,7 @@ class ConsoleTest(unittest.TestCase):
 
         returns = console_ops.rerun(dataset, *ids)
         print(returns)
+
     def test_pipeline(self):
         db_pipe = Pipeline(self.connection_str)
         pipelines = db_pipe.pipelines
@@ -114,19 +117,25 @@ class ConsoleTest(unittest.TestCase):
             "pages": 1
         }, credential_id=credential_id)
         load = Load(self.console)
+        print('--run_firecrawl completed')
         from davidkhala.ai.agent.dify.plugins.firecrawl import Console
+
+        datasource_info_list = []
         for source in sources_r:
             source['credential_id'] = credential_id
+            source['title'] = source['source_url']
             Console(**source)  # schema validation
+            datasource_info_list.append(source)
 
-            run_r = load.async_run(p_id, node, inputs={
-                'child_length': 24
-            }, datasource_info_list=[source])
-            # wait until
-            for document in run_r.documents:
-                final = console_ops.wait_until(run_r.dataset.id, document.id, from_status=[IndexingStatus.WAITING, IndexingStatus.PARSING, IndexingStatus.COMPLETED, IndexingStatus.FAILED])
-                print(final)
-
+        run_r = load.async_run(p_id, node, inputs={
+            'child_length': 512
+        }, datasource_info_list=datasource_info_list)
+        # wait until
+        for document in run_r.documents:
+            final = console_ops.wait_until(run_r.dataset.id, document.id,
+                                           from_status=[IndexingStatus.WAITING, IndexingStatus.PARSING,
+                                                        IndexingStatus.COMPLETED, IndexingStatus.FAILED])
+            print(final)
 
 
 if __name__ == '__main__':
