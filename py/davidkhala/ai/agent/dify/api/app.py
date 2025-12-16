@@ -1,6 +1,9 @@
 import json
-from davidkhala.utils.http_request.stream import Request as StreamRequest, as_sse
+from typing import TypedDict
+
 import requests
+from davidkhala.utils.http_request.stream import Request as StreamRequest, as_sse
+from requests import Response, Session
 
 from davidkhala.ai.agent.dify.api import API
 
@@ -39,20 +42,57 @@ class Conversation(API):
             'user': self.user,
         })
 
-    def async_chat(self, template: str,
-                   previous_conversation_id: str = None, *, values: dict = None, files: list = None
-                   ):
+    def _chat_request_from(self, template: str, stream, **kwargs):
         """
-        Note: "Agent Chat App does not support blocking mode"
+        :param template:
+        :param stream: Note: "Agent Chat App does not support blocking mode"
+        :param kwargs:
+        :return:
         """
+        return {
+            'url': f"{self.base_url}/chat-messages",
+            'method': "POST",
+            'json': {
+                'query': template,
+                'inputs': kwargs.pop('values', {}),  # to substitute query/template
+                'response_mode': 'streaming' if stream else 'blocking',
+                'conversation_id': kwargs.pop('conversation_id', None),
+                'user': self.user,
+                'files': kwargs.pop('files', [])
+            },
+            **kwargs
+        }
+
+    def async_chat(self, template: str, **kwargs) -> tuple[Response, Session]:
         s = StreamRequest(self)
-        response = s.request(f"{self.base_url}/chat-messages", "POST", json={
-            'query': template,
-            'inputs': values,
-            'response_mode': 'streaming',
-            'conversation_id': previous_conversation_id,
-            'user': self.user,
-            'files': files
-        })
+        s.session = Session()
+        return s.request(**self._chat_request_from(template, True, **kwargs)), s.session
+
+    class ChatResult(TypedDict, total=False):
+        thought: list[str]
+        metadata: dict
+
+    @staticmethod
+    def reduce_chat_stream(response: Response) -> ChatResult:
+        r: Conversation.ChatResult = {
+            'thought': [],
+        }
         for data in as_sse(response):
-            print(data)
+            match data['event']:
+                case 'agent_thought':
+                    r['thought'].append(data['thought'])
+                case 'message_end':
+                    r['metadata'] = data['metadata']
+        return r
+
+    def agent_chat(self, template: str, **kwargs) -> ChatResult:
+        r, session = self.async_chat(template, **kwargs)
+        reduced = Conversation.reduce_chat_stream(r)
+        session.close()
+        return reduced
+
+    def bot_chat(self, template: str, **kwargs):
+        r = self.request(**self._chat_request_from(template, False, **kwargs))
+        assert r.pop('event') == 'message'
+        assert r.pop('mode') == 'chat'
+        return r

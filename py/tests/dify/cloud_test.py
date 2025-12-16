@@ -106,7 +106,7 @@ class DocumentTest(CloudTest):
         doc.delete()
 
 class ChatAppTest(unittest.TestCase):
-    api_key = os.getenv('APP_API_KEY')
+    api_key = os.getenv('APP_API_KEY') or 'app-fZVszIQWFFSUBLiSR2DE7Un3'
 
     def test_list_feedback(self):
         f = Feedbacks(self.api_key)
@@ -119,11 +119,18 @@ class ChatAppTest(unittest.TestCase):
             c.paginate_messages('f96b5cfc-7006-4afe-b8fe-e0e04374d40f')
         self.assertEqual(context.exception.response.status_code, 404)  # security isolation
 
-    def test_chat(self):
+    def test_agent_chat(self):
         me = '45bdc865-6d71-40ab-8892-af53906362fa'
-        c = Conversation(self.api_key, me)
-        c.async_chat("What are the specs of the iPhone 13 Pro Max?")
-
+        api_key = os.getenv('AGENT_API_KEY')
+        c = Conversation(api_key, me)
+        r = c.agent_chat("What are the specs of the iPhone 13 Pro Max?")
+        print(r)
+    def test_bot_chat(self):
+        me = '45bdc865-6d71-40ab-8892-af53906362fa'
+        api_key = os.getenv('BOT_API_KEY')
+        c = Conversation(api_key, me)
+        r = c.bot_chat("What are the specs of the iPhone 13 Pro Max?")
+        print(r)
 
 
 if __name__ == '__main__':

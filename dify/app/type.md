@@ -23,6 +23,7 @@ defined by top-right corner
 >　LLM-based chatbot with simple setup
 # basic type: Agent
 > Intelligent agent with reasoning and autonomous tool use
+- Agent Mode is not configurable, always `Function Calling` 
 
 # basic type: Text Generator
 > Al assistant for text generation tasks
