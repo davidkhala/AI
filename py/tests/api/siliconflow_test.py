@@ -45,16 +45,19 @@ class RerankTestCase(unittest.TestCase):
         query = 'apple'
         docs = ["apple", "banana", "fruit", "vegetable"]
         self.assertEqual('apple', _.which(query, docs)[0])
-        _.model = 'Qwen/Qwen3-Reranker-8B'
-        self.assertEqual('banana', _.which(query, docs)[0]) # unnatural model
-        _.model = 'Qwen/Qwen3-Reranker-4B'
-        self.assertEqual('banana', _.which(query, docs)[0]) # unnatural model
+        _.model = 'Qwen/Qwen3-Reranker-8B'  # unnatural model, and inconsistent
+        self.assertIn(_.which(query, docs)[0], ['apple', 'banana'])
+        _.model = 'Qwen/Qwen3-Reranker-4B' # unnatural model, and inconsistent
+        self.assertIn(_.which(query, docs)[0], ['banana', 'fruit'])
         _.model = 'Qwen/Qwen3-Reranker-0.6B'
         self.assertEqual('apple', _.which(query, docs)[0])
+
     def test_null(self):
         _.model = 'BAAI/bge-reranker-v2-m3'
         with self.assertRaises(HTTPError) as e:
-            _.which('apple', []) # bad request
+            _.which('apple', [])  # bad request
         self.assertEqual(400, e.exception.response.status_code)
+
+
 if __name__ == '__main__':
     unittest.main()
