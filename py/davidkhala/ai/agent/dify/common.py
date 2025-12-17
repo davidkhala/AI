@@ -34,3 +34,14 @@ class Dataset(BaseModel):
 class IndexingError(Exception):
     """Raised when document indexing fails (indexing_status = 'error')"""
     pass
+
+
+class JsonData(BaseModel):
+    data: list
+
+
+class NodeOutput(BaseModel):
+    """Schema for Output of a Dify node"""
+    text: str
+    files: list
+    json: list[JsonData]

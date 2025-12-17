@@ -4,16 +4,13 @@ from sqlalchemy.orm import Session
 from sqlalchemy import desc
 
 class Studio(DB):
-    @property
-    def user_feedbacks(self):
-        sql = """SELECT mf.conversation_id,
+    user_feedbacks_sql = """SELECT mf.conversation_id,
                         mf.content,
                         m.query,
                         m.answer
                  FROM message_feedbacks mf
                           LEFT JOIN messages m ON mf.message_id = m.id
                  WHERE mf.from_source = 'user'"""
-        return self.get_dict(sql)
 
     @property
     def apps(self): return self.get_dict("select id, name, mode from apps where status = 'normal'")

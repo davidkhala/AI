@@ -1,5 +1,4 @@
-import warnings
-
+from davidkhala.utils.syntax.compat import deprecated
 from openai import AzureOpenAI, OpenAI
 
 from davidkhala.ai.openai import Client
@@ -20,7 +19,7 @@ class ModelDeploymentClient(AzureHosted):
         )
 
 
-@warnings.deprecated("Azure Open AI is deprecated. Please migrate to Azure AI Foundry")
+@deprecated("Azure Open AI is deprecated. Please migrate to Microsoft Foundry")
 class OpenAIClient(AzureHosted):
 
     def __init__(self, api_key, project):

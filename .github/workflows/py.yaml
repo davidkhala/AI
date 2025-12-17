@@ -5,6 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        version: [3.12, latest]
         provider: [openrouter, siliconflow]
     environment: ${{matrix.provider}}
     env:
@@ -18,14 +19,17 @@ jobs:
           test-entry-point: pytest ${{matrix.provider}}_test.py
           tests: py/tests/api
           extras: api
+          version: ${{matrix.version}}
 
   openrouter:
     runs-on: ubuntu-latest
     environment: openrouter
+    strategy:
+      matrix:
+        version: [ 3.12, latest ]
     env:
       API_KEY: ${{secrets.API_KEY}}
       PROVISIONING_API_KEY: ${{secrets.PROVISIONING_API_KEY}}
-
     steps:
       - uses: actions/checkout@main
       - uses: davidkhala/uv-buildpack@main
@@ -34,10 +38,13 @@ jobs:
           test-entry-point: pytest openrouter_test.py
           tests: py/tests
           extras: openrouter
-
+          version: ${{matrix.version}}
   azure:
     runs-on: ubuntu-latest
     environment: azure
+    strategy:
+      matrix:
+        version: [ 3.12, latest ]
     env:
       PROJECT: ${{vars.PROJECT}}
       API_KEY: ${{secrets.API_KEY}}
@@ -51,6 +58,7 @@ jobs:
           test-entry-point: pytest azure_test.py
           tests: py/tests
           extras: azure
+          version: ${{matrix.version}}
   langgraph:
     runs-on: ubuntu-latest
     environment: openrouter
@@ -64,10 +72,13 @@ jobs:
           test-entry-point: pytest langchain_test.py
           tests: py/tests
           extras: langchain
-          version: 3.13
+          version: 3.12
   alicloud:
     runs-on: ubuntu-latest
     environment: alicloud
+    strategy:
+      matrix:
+        version: [ 3.12, latest ]
     env:
       API_KEY: ${{secrets.API_KEY}}
     steps:
@@ -78,3 +89,4 @@ jobs:
           test-entry-point: pytest ali_test.py
           tests: py/tests
           extras: ali
+          version: ${{matrix.version}}

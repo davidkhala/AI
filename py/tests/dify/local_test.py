@@ -23,7 +23,7 @@ class DBTest(unittest.TestCase):
         print(self.info.accounts)
 
     def test_user_feedbacks(self):
-        print(self.app.user_feedbacks)
+        print(self.app.get_dict(Studio.user_feedbacks_sql))
 
     def test_generate_conversation_opener(self):
         from davidkhala.ai.openrouter import Client
