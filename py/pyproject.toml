@@ -8,18 +8,16 @@ requires-python = ">=3.13"
 [project.optional-dependencies]
 langchain = [
     "langgraph", "langchain",
-    "langchain-openai" # required by openRouter
+    "langchain-openai ; python_version < '3.14'" # required by openRouter
 ]
 ragflow = ["ragflow-sdk"]
 google = ["google-genai", "google-adk"]
 api = ["davidkhala.utils[http_request]"]
 hf = [
     "huggingface_hub", 'hf_xet',
-    'onnxruntime','onnx' # for test only
+    'onnxruntime', 'onnx' # for test only
 ]
-openrouter = [
-    "openrouter", "davidkhala.utils[http_request]"
-]
+openrouter = ["openrouter"]
 ali = ["dashscope"]
 azure = ["openai"]
 telemetry = [
