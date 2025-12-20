@@ -1,14 +1,18 @@
 import os
 import unittest
 
+from agentbay.browser import BrowserOption
+
 from davidkhala.ai.ali.dashscope import API, ModelEnum
-
-api_key = os.environ.get('API_KEY')
-
-
+from davidkhala.ai.ali.agentbay import Client as BayClient
+from playwright.sync_api import sync_playwright
 class DashscopeTestCase(unittest.TestCase):
-    api = API(api_key)
+
+
     prompt = '今天天气好吗？'
+    def setUp(self):
+        api_key = os.environ.get('API_KEY')
+        self.api = API(api_key)
 
     def test_chat(self):
         self.api.as_chat(ModelEnum.PLUS)
@@ -28,6 +32,26 @@ class DashscopeTestCase(unittest.TestCase):
         self.api.as_embeddings()
         r = self.api.encode(self.prompt)
         print(r)
+
+class AgentBayTestCase(unittest.TestCase):
+
+    def setUp(self):
+        api_key = os.getenv("AGENTBAY_API_KEY")
+        self.agent = BayClient(api_key)
+        assert self.agent.open()
+
+    def test_AIBrowser(self):
+        self.agent.session.browser.initialize(BrowserOption())
+        url = self.agent.session.browser.get_endpoint_url()
+        with sync_playwright() as p:
+            browser = p.chromium.connect_over_cdp(url)
+            page = browser.new_page()
+            page.goto("https://www.aliyun.com")
+            print("Title:", page.title())
+            browser.close()
+
+    def tearDown(self):
+        self.agent.close()
 
 
 if __name__ == '__main__':
