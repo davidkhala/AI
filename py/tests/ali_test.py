@@ -1,11 +1,10 @@
 import os
 import unittest
 
-from agentbay.browser import BrowserOption
-
-from davidkhala.ai.ali.dashscope import API, ModelEnum
-from davidkhala.ai.ali.agentbay import Client as BayClient
 from playwright.sync_api import sync_playwright
+
+from davidkhala.ai.ali.agentbay import Client as BayClient, Browser
+from davidkhala.ai.ali.dashscope import API, ModelEnum
 
 
 class DashscopeTestCase(unittest.TestCase):
@@ -43,15 +42,16 @@ class AgentBayTestCase(unittest.TestCase):
         assert self.agent.open()
 
     def test_AIBrowser(self):
-        self.agent.session.browser.initialize(BrowserOption())
-        url = self.agent.session.browser.get_endpoint_url()
+        browser = Browser(self.agent.session)
+        browser.open()
+        url = browser.endpoint_url
         with sync_playwright() as p:
-            browser = p.chromium.connect_over_cdp(url)
-            page = browser.new_page()
+            playwright = p.chromium.connect_over_cdp(url)
+            page = playwright.new_page()
             page.goto("https://www.aliyun.com")
             self.assertEqual('Captcha Interception', page.title())
-            browser.close()
-
+            playwright.close()
+        browser.close()
     def tearDown(self):
         self.agent.close()
 

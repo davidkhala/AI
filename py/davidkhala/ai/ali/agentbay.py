@@ -1,7 +1,9 @@
 from agentbay import AgentBay, Session, Config, AgentBayLogger
+from agentbay.browser import BrowserOption
 from davidkhala.utils.syntax.interface import ContextAware
 
-AgentBayLogger.setup(level='WARNING') # Default to INFO
+AgentBayLogger.setup(level='WARNING')  # Default to INFO
+
 
 class Client(ContextAware):
     def __init__(self, api_key, *, timeout_ms=10000):
@@ -21,3 +23,18 @@ class Client(ContextAware):
     def close(self):
         self.agent.delete(self.session)
         del self.session
+
+
+class Browser(ContextAware):
+    def __init__(self, session: Session):
+        self.session = session
+        self.option = BrowserOption()
+        self.endpoint_url: str | None = None
+
+    def open(self) -> bool:
+        success = self.session.browser.initialize(self.option)
+        self.endpoint_url = self.session.browser.get_endpoint_url()
+        return success
+
+    def close(self):
+        self.session.browser.destroy()
