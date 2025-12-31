@@ -2,7 +2,8 @@ import json
 import os
 import unittest
 
-from davidkhala.ai.agent.dify.common import IndexingError, IndexingStatus
+from davidkhala.ai.agent.dify.interface import IndexingError
+from davidkhala.ai.agent.dify.const import IndexingStatus
 from davidkhala.ai.agent.dify.ops.console.knowledge import Datasource, Operation, Load
 from davidkhala.ai.agent.dify.ops.console.session import ConsoleUser
 from davidkhala.ai.agent.dify.ops.db.app import Studio

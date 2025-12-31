@@ -3,7 +3,9 @@ from time import sleep
 from davidkhala.utils.http_request.stream import as_sse, Request as StreamRequest
 from pydantic import BaseModel
 
-from davidkhala.ai.agent.dify.common import IndexingStatus, IndexingError, Dataset, Document
+from davidkhala.ai.agent.dify.interface import IndexingError
+from davidkhala.ai.agent.dify.model import Document, Dataset
+from davidkhala.ai.agent.dify.const import IndexingStatus
 from davidkhala.ai.agent.dify.ops.console import API
 from davidkhala.ai.agent.dify.ops.console.session import ConsoleUser
 from davidkhala.ai.agent.dify.ops.db.orm import Node

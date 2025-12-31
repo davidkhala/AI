@@ -8,7 +8,8 @@ from urllib.parse import urlparse
 import requests
 
 from davidkhala.ai.agent.dify.api import API, Iterator
-from davidkhala.ai.agent.dify.common import Document as DocumentBase
+from davidkhala.ai.agent.dify.model import Document as DocumentBase
+
 
 class DatasetDict(TypedDict):
     id: str

@@ -2,7 +2,7 @@ import os
 import unittest
 
 from davidkhala.ai.agent.dify.api.knowledge import Dataset
-from davidkhala.ai.agent.dify.common import IndexingStatus
+from davidkhala.ai.agent.dify.const import IndexingStatus
 from tests.util import prepare_logger
 
 

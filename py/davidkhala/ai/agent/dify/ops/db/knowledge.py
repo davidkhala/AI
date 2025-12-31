@@ -26,16 +26,22 @@ class Dataset(DB):
         template = "select id from datasource_providers where name = :name and provider = :provider"
         return self.query(template, {'name': name, 'provider': provider}).scalars().all()
 
+    def documents(self, dataset_id: str):
+        template = "select id, name,created_from, created_at from documents where dataset_id = :dataset_id"
+        return self.query(template, {'dataset_id': dataset_id})
+
 
 class Document(DB):
     def hit_documents(self, top_k: int = 3):
         template = "SELECT dataset_id, document_id, content FROM document_segments ORDER BY hit_count DESC LIMIT :top_k"
         return self.get_dict(template, {'top_k': top_k})
 
-    def id_by(self, name) -> list[str]:
+    def id_by(self, name: str, dataset_id: str = None) -> list[str]:
         """multiple ids can be found"""
         template = "select id from documents where name = :name"
-        return [str(uuid) for uuid in self.query(template, {'name': name}).scalars().all()]
+        if dataset_id:
+            template = "select id from documents where name = :name and dataset_id = :dataset_id"
+        return [str(uuid) for uuid in self.query(template, {'name': name, 'dataset_id': dataset_id}).scalars().all()]
 
 
 class Pipeline(DB):
