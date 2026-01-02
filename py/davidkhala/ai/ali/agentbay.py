@@ -1,5 +1,4 @@
-from agentbay import AgentBay, Session, Config, AgentBayLogger
-from agentbay.browser import BrowserOption
+from agentbay import AgentBay, Session, Config, AgentBayLogger, BrowserOption
 from davidkhala.utils.syntax.interface import ContextAware
 
 AgentBayLogger.setup(level='WARNING')  # Default to INFO

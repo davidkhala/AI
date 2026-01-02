@@ -81,6 +81,7 @@ jobs:
         version: [ 3.12, latest ]
     env:
       API_KEY: ${{secrets.API_KEY}}
+      AGENTBAY_API_KEY: ${{secrets.AGENTBAY_API_KEY}}
     steps:
       - uses: actions/checkout@main
       - uses: davidkhala/uv-buildpack@main
