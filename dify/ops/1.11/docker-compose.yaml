@@ -47,11 +47,11 @@ x-shared-env: &shared-api-worker-env
   ENABLE_WEBSITE_FIRECRAWL: ${ENABLE_WEBSITE_FIRECRAWL:-true}
   ENABLE_WEBSITE_WATERCRAWL: ${ENABLE_WEBSITE_WATERCRAWL:-true}
   NEXT_PUBLIC_ENABLE_SINGLE_DOLLAR_LATEX: ${NEXT_PUBLIC_ENABLE_SINGLE_DOLLAR_LATEX:-false}
-  DB_USERNAME: ${DB_USERNAME:-postgres}
-  DB_PASSWORD: ${DB_PASSWORD:-difyai123456}
-  DB_HOST: ${DB_HOST:-db}
-  DB_PORT: ${DB_PORT:-5432}
-  DB_DATABASE: ${DB_DATABASE:-dify}
+  DB_USERNAME: ${DB_USERNAME}
+  DB_PASSWORD: ${DB_PASSWORD}
+  DB_HOST: ${DB_HOST}
+  DB_PORT: ${DB_PORT}
+  DB_DATABASE: ${DB_DATABASE}
   SQLALCHEMY_POOL_SIZE: ${SQLALCHEMY_POOL_SIZE:-30}
   SQLALCHEMY_MAX_OVERFLOW: ${SQLALCHEMY_MAX_OVERFLOW:-10}
   SQLALCHEMY_POOL_RECYCLE: ${SQLALCHEMY_POOL_RECYCLE:-3600}
@@ -103,8 +103,12 @@ x-shared-env: &shared-api-worker-env
   VECTOR_INDEX_NAME_PREFIX: ${VECTOR_INDEX_NAME_PREFIX:-Vector_index}
   #
   UPLOAD_FILE_SIZE_LIMIT: ${UPLOAD_FILE_SIZE_LIMIT:-15}
-  UPLOAD_FILE_BATCH_LIMIT: ${UPLOAD_FILE_BATCH_LIMIT:-5}
+  UPLOAD_FILE_BATCH_LIMIT: ${UPLOAD_FILE_BATCH_LIMIT:-10}
   UPLOAD_FILE_EXTENSION_BLACKLIST: ${UPLOAD_FILE_EXTENSION_BLACKLIST:-}
+  SINGLE_CHUNK_ATTACHMENT_LIMIT: ${SINGLE_CHUNK_ATTACHMENT_LIMIT:-10}
+  IMAGE_FILE_BATCH_LIMIT: ${IMAGE_FILE_BATCH_LIMIT:-10}
+  ATTACHMENT_IMAGE_FILE_SIZE_LIMIT: ${ATTACHMENT_IMAGE_FILE_SIZE_LIMIT:-2}
+  ATTACHMENT_IMAGE_DOWNLOAD_TIMEOUT: ${ATTACHMENT_IMAGE_DOWNLOAD_TIMEOUT:-60}
   ETL_TYPE: ${ETL_TYPE:-dify}
   UNSTRUCTURED_API_URL: ${UNSTRUCTURED_API_URL:-}
   UNSTRUCTURED_API_KEY: ${UNSTRUCTURED_API_KEY:-}
@@ -190,10 +194,7 @@ x-shared-env: &shared-api-worker-env
   TEXT_GENERATION_TIMEOUT_MS: ${TEXT_GENERATION_TIMEOUT_MS:-60000}
   ALLOW_UNSAFE_DATA_SCHEME: ${ALLOW_UNSAFE_DATA_SCHEME:-false}
   MAX_TREE_DEPTH: ${MAX_TREE_DEPTH:-50}
-  POSTGRES_USER: ${POSTGRES_USER:-${DB_USERNAME}}
-  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-${DB_PASSWORD}}
-  POSTGRES_DB: ${POSTGRES_DB:-${DB_DATABASE}}
-  PGDATA: ${PGDATA:-/var/lib/postgresql/data/pgdata}
+
   SANDBOX_API_KEY: ${SANDBOX_API_KEY:-dify-sandbox}
   SANDBOX_GIN_MODE: ${SANDBOX_GIN_MODE:-release}
   SANDBOX_WORKER_TIMEOUT: ${SANDBOX_WORKER_TIMEOUT:-15}
@@ -235,9 +236,9 @@ x-shared-env: &shared-api-worker-env
   CSP_WHITELIST: ${CSP_WHITELIST:-}
   MAX_SUBMIT_COUNT: ${MAX_SUBMIT_COUNT:-100}
   TOP_K_MAX_VALUE: ${TOP_K_MAX_VALUE:-10}
-  DB_PLUGIN_DATABASE: ${DB_PLUGIN_DATABASE:-dify_plugin}
-  EXPOSE_PLUGIN_DAEMON_PORT: ${EXPOSE_PLUGIN_DAEMON_PORT:-5002}
-  PLUGIN_DAEMON_PORT: ${PLUGIN_DAEMON_PORT:-5002}
+  DB_PLUGIN_DATABASE: ${DB_PLUGIN_DATABASE}
+  EXPOSE_PLUGIN_DAEMON_PORT: ${PLUGIN_DAEMON_PORT}
+  PLUGIN_DAEMON_PORT: ${PLUGIN_DAEMON_PORT}
   PLUGIN_DAEMON_KEY: ${PLUGIN_DAEMON_KEY:-lYkiYYT6owG+71oLerGzA7GXCgOT++6ovaezWAjpCjf+Sjc3ZtU+qUEi}
   PLUGIN_DAEMON_URL: ${PLUGIN_DAEMON_URL:-http://plugin_daemon:5002}
   PLUGIN_MAX_PACKAGE_SIZE: ${PLUGIN_MAX_PACKAGE_SIZE:-52428800}
@@ -282,7 +283,7 @@ x-shared-env: &shared-api-worker-env
   QUEUE_MONITOR_THRESHOLD: ${QUEUE_MONITOR_THRESHOLD:-200}
   QUEUE_MONITOR_ALERT_EMAILS: ${QUEUE_MONITOR_ALERT_EMAILS:-}
   QUEUE_MONITOR_INTERVAL: ${QUEUE_MONITOR_INTERVAL:-30}
-  SWAGGER_UI_ENABLED: ${SWAGGER_UI_ENABLED:-true}
+  SWAGGER_UI_ENABLED: ${SWAGGER_UI_ENABLED:-false}
   SWAGGER_UI_PATH: ${SWAGGER_UI_PATH:-/swagger-ui.html}
   DSL_EXPORT_ENCRYPT_DATASET_ID: ${DSL_EXPORT_ENCRYPT_DATASET_ID:-true}
   DATASET_MAX_SEGMENTS_PER_REQUEST: ${DATASET_MAX_SEGMENTS_PER_REQUEST:-0}
@@ -308,6 +309,25 @@ x-shared-env: &shared-api-worker-env
   QDRANT_REPLICATION_FACTOR: ${QDRANT_REPLICATION_FACTOR:-1}
 
 services:
+  # Init container to fix permissions
+  init_permissions:
+    image: busybox:latest
+    command:
+      - sh
+      - -c
+      - |
+        FLAG_FILE="/app/api/storage/.init_permissions"
+        if [ -f "$${FLAG_FILE}" ]; then
+          echo "Permissions already initialized. Exiting."
+          exit 0
+        fi
+        echo "Initializing permissions for /app/api/storage"
+        chown -R 1001:1001 /app/api/storage && touch "$${FLAG_FILE}"
+        echo "Permissions initialized. Exiting."
+    volumes:
+      - dify-app-storage:/app/api/storage
+    restart: "no"
+
   # API service
   api:
     image: langgenius/dify-api:1.11.2
@@ -323,8 +343,11 @@ services:
       PLUGIN_REMOTE_INSTALL_HOST: ${EXPOSE_PLUGIN_DEBUGGING_HOST:-localhost}
       PLUGIN_REMOTE_INSTALL_PORT: ${EXPOSE_PLUGIN_DEBUGGING_PORT:-5003}
       PLUGIN_MAX_PACKAGE_SIZE: ${PLUGIN_MAX_PACKAGE_SIZE:-52428800}
+      PLUGIN_DAEMON_TIMEOUT: ${PLUGIN_DAEMON_TIMEOUT:-600.0}
       INNER_API_KEY_FOR_PLUGIN: ${PLUGIN_DIFY_INNER_API_KEY:-QaHbTe77CtuXmsfyhR7+vRjI/+XbV1AaFy691iy+kGDv2Jvy0/eAh8Y1}
     depends_on:
+      init_permissions:
+        condition: service_completed_successfully
       db:
         condition: service_healthy
       redis:
@@ -332,7 +355,6 @@ services:
     volumes:
       # Mount the storage directory to the container, for storing user files.
       - dify-app-storage:/app/api/storage
-    user: "0:0" # FIXME cater permission deny in volume in env Docker Desktop Windows
     networks:
       - ssrf_proxy_network
       - default
@@ -353,6 +375,8 @@ services:
       PLUGIN_MAX_PACKAGE_SIZE: ${PLUGIN_MAX_PACKAGE_SIZE:-52428800}
       INNER_API_KEY_FOR_PLUGIN: ${PLUGIN_DIFY_INNER_API_KEY:-QaHbTe77CtuXmsfyhR7+vRjI/+XbV1AaFy691iy+kGDv2Jvy0/eAh8Y1}
     depends_on:
+      init_permissions:
+        condition: service_completed_successfully
       db:
         condition: service_healthy
       redis:
@@ -360,9 +384,8 @@ services:
     volumes:
       # Mount the storage directory to the container, for storing user files.
       - dify-app-storage:/app/api/storage
-    user: "0:0" # FIXME cater permission deny in volume in env Docker Desktop Windows
-    deploy:
-      replicas: 4
+#    deploy:
+#      replicas: 4
     networks:
       - ssrf_proxy_network
       - default
@@ -378,6 +401,8 @@ services:
       # Startup mode, 'worker_beat' starts the Celery beat for scheduling periodic tasks.
       MODE: beat
     depends_on:
+      init_permissions:
+        condition: service_completed_successfully
       db:
         condition: service_healthy
       redis:
@@ -413,17 +438,16 @@ services:
       ENABLE_WEBSITE_JINAREADER: ${ENABLE_WEBSITE_JINAREADER:-true}
       ENABLE_WEBSITE_FIRECRAWL: ${ENABLE_WEBSITE_FIRECRAWL:-true}
       ENABLE_WEBSITE_WATERCRAWL: ${ENABLE_WEBSITE_WATERCRAWL:-true}
-      NEXT_PUBLIC_ENABLE_SINGLE_DOLLAR_LATEX: ${NEXT_PUBLIC_ENABLE_SINGLE_DOLLAR_LATEX:-false}
 
   # The PostgreSQL database.
   db:
     image: postgres:15-alpine
     restart: always
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-difyai123456}
-      POSTGRES_DB: ${POSTGRES_DB:-dify}
-      PGDATA: ${PGDATA:-/var/lib/postgresql/data/pgdata}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+      PGDATA: /var/lib/postgresql/data/pgdata
     command: >
       postgres -c 'max_connections=${POSTGRES_MAX_CONNECTIONS:-100}'
                -c 'shared_buffers=${POSTGRES_SHARED_BUFFERS:-128MB}'
@@ -444,9 +468,9 @@ services:
           "-h",
           "db",
           "-U",
-          "${PGUSER:-postgres}",
+          "${DB_USERNAME}",
           "-d",
-          "${POSTGRES_DB:-dify}",
+          "${DB_DATABASE}",
         ]
       interval: 1s
       timeout: 3s
@@ -496,13 +520,13 @@ services:
 
   # plugin daemon
   plugin_daemon:
-    image: langgenius/dify-plugin-daemon:0.4.1-local
+    image: langgenius/dify-plugin-daemon:0.5.2-local
     restart: always
     environment:
       # Use the shared environment variables.
       <<: *shared-api-worker-env
-      DB_DATABASE: ${DB_PLUGIN_DATABASE:-dify_plugin}
-      SERVER_PORT: ${PLUGIN_DAEMON_PORT:-5002}
+      DB_DATABASE: ${DB_PLUGIN_DATABASE}
+      SERVER_PORT: ${PLUGIN_DAEMON_PORT}
       SERVER_KEY: ${PLUGIN_DAEMON_KEY:-lYkiYYT6owG+71oLerGzA7GXCgOT++6ovaezWAjpCjf+Sjc3ZtU+qUEi}
       MAX_PLUGIN_PACKAGE_SIZE: ${PLUGIN_MAX_PACKAGE_SIZE:-52428800}
       PPROF_ENABLED: ${PLUGIN_PPROF_ENABLED:-false}

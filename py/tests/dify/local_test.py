@@ -9,7 +9,7 @@ from davidkhala.ai.agent.dify.ops.console.session import ConsoleUser
 from davidkhala.ai.agent.dify.ops.db.app import Studio
 from davidkhala.ai.agent.dify.ops.db.knowledge import Dataset, Document, Pipeline
 from davidkhala.ai.agent.dify.ops.db.sys import Info
-
+from davidkhala.ai.agent.dify.ops.console.plugin import ConsolePlugin
 
 class DBTest(unittest.TestCase):
     def setUp(self):
@@ -138,6 +138,29 @@ class ConsoleTest(unittest.TestCase):
                                                         IndexingStatus.COMPLETED, IndexingStatus.FAILED])
             print(final)
 
+    def test_plugin_get(self):
+        pluginManage = ConsolePlugin(self.console)
+        plugins = ["langgenius/azure_openai", "langgenius/siliconflow", 'notexist']
+        r = pluginManage.get(*plugins)
+        self.assertEqual(2, len(r))
+
+        r = pluginManage.get('notexist')
+        self.assertEqual(0, len(r))
+        r = pluginManage.get('langgenius/deepseek')
+        print(r)
+
+    def test_plugin_list(self):
+        pluginManage = ConsolePlugin(self.console)
+        r = pluginManage.plugins()
+        print(r)
+    def test_plugin_install(self):
+        pluginManage = ConsolePlugin(self.console)
+        from davidkhala.ai.agent.dify.plugins.popular import Node
+        r = pluginManage.upgrade(*Node.agent)
+
+        pluginManage.uninstall_by(*Node.agent)
+        current = pluginManage.get(*Node.agent)
+        self.assertEqual(0, len(current))
 
 if __name__ == '__main__':
     if not os.getenv('CI'):

@@ -1,3 +1,5 @@
+from base64 import b64encode
+
 from davidkhala.ai.agent.dify.ops.console import API
 
 
@@ -11,7 +13,7 @@ class ConsoleUser(API):
 
         r = self.request(url, "POST", json={
             'email': email,
-            'password': password,
+            'password': b64encode(password.encode()).decode(), # use base64 from dify 1.11
             'remember_me': remember_me,
             'language': language,
         })
