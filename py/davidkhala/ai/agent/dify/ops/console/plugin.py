@@ -40,7 +40,7 @@ class ConsolePlugin(API):
         return _
 
     def get(self, *plugin_names: str) -> list[dict]:
-        "inspect installed plugins"
+        """inspect installed plugins"""
         url = f"{self.base_url}/list/installations/ids"
         r = self.request(url, method="POST", json={
             'plugin_ids': plugin_names,

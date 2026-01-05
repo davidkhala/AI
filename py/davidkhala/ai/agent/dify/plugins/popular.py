@@ -32,5 +32,8 @@ class Node:
         'junjiem/db_query',
         'junjiem/db_query_pre_auth',
     ]
-
+    web = [
+        'langgenius/searxng',
+        'langgenius/firecrawl'
+    ]
 
