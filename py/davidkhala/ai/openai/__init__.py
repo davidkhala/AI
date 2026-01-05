@@ -12,8 +12,15 @@ class Client(AbstractClient):
     n = 1
 
     def connect(self):
-        self.client.models.list()
+        try:
+            type(self).models.fget(self)
+            return True
+        except: # TODO make specific
+            return False
 
+    @property
+    def models(self):
+        return self.client.models.list()
     def encode(self, *_input: str) -> list[list[float]]:
         response = self.client.embeddings.create(
             model=self.model,
