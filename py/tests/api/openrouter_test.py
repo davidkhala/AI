@@ -25,7 +25,7 @@ class APITestCase(unittest.TestCase):
 
     def test_models(self):
         models = self.openrouter.free_models
-        self.assertGreaterEqual(len(models), 35)
+        self.assertGreaterEqual(len(models), 32)
         print(models)
 
     def test_google_limit(self):

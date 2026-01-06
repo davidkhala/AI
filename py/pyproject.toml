@@ -17,6 +17,7 @@ hf = [
     "huggingface_hub", 'hf_xet',
     'onnxruntime', 'onnx' # for test only
 ]
+you = ['youdotcom']
 openrouter = ["openrouter"]
 ali = ["dashscope", "wuying-agentbay-sdk", "davidkhala.utils"]
 azure = ["openai", "davidkhala.utils"]

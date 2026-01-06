@@ -1,6 +1,20 @@
 on: push
 
 jobs:
+  you:
+    environment: you
+    runs-on: ubuntu-latest
+    env:
+      YOU_API_KEY: ${{secrets.YOU_API_KEY}}
+    steps:
+      - uses: actions/checkout@main
+      - uses: davidkhala/uv-buildpack@main
+        with:
+          working-directory: py
+          test-entry-point: pytest you_test.py
+          tests: py/tests
+          extras: you
+
   api:
     runs-on: ubuntu-latest
     strategy:
