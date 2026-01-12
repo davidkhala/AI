@@ -6,6 +6,7 @@ from openrouter import OpenRouter
 
 class Client(AbstractClient):
     def __init__(self, api_key: str):
+        super().__init__()
         self.api_key = api_key
         self.client = OpenRouter(api_key)
 

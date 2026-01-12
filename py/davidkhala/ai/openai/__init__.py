@@ -1,17 +1,20 @@
-import runpy
-from typing import Union, Literal
+from typing import Literal
 
-from openai import OpenAI, AsyncOpenAI
+from httpx import URL
+from openai import OpenAI
 
 from davidkhala.ai.model import AbstractClient
 from davidkhala.ai.model.chat import on_response
 
 
 class Client(AbstractClient):
-    client: OpenAI
-    encoding_format: Literal["float", "base64"] = "float"
-    n = 1
-
+    def __init__(self, client: OpenAI):
+        super().__init__()
+        self.client:OpenAI = client
+        self.base_url:URL = client.base_url
+        self.api_key = client.api_key
+        self.encoding_format:Literal["float", "base64"] = "float"
+        self.n:int = 1
     def connect(self):
         try:
             type(self).models.fget(self)
@@ -66,7 +69,4 @@ class Client(AbstractClient):
         self.client.close()
 
 
-def with_opik(instance: Union[OpenAI, AsyncOpenAI]):
-    from opik.integrations.openai import track_openai
-    runpy.run_path('../opik.py')
-    return track_openai(instance)
+

@@ -4,12 +4,11 @@ from davidkhala.ai.openai import Client as BaseClient
 
 class Client(BaseClient):
     def __init__(self, host: str, token: str):
-        self.api_key = token
-        self.base_url = f"https://{host}/serving-endpoints"
-        self.client = OpenAI(
-            base_url=self.base_url,
+        super().__init__(OpenAI(
+            base_url=f"https://{host}/serving-endpoints",
             api_key=token
-        )
+        ))
+
     def chat(self, *user_prompt, **kwargs):
         """Databricks always reasoning"""
         rs = super().chat(*user_prompt, **kwargs)

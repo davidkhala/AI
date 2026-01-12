@@ -4,7 +4,7 @@ from http import HTTPStatus
 from dashscope.api_entities.dashscope_response import DashScopeAPIResponse
 
 from dashscope import Generation, TextEmbedding
-from davidkhala.ai.model import AbstractClient
+from davidkhala.ai.model import AbstractClient, MessageDict
 
 
 class ModelEnum(str, Enum):
@@ -21,11 +21,10 @@ class API(AbstractClient):
     Unsupported to use international base_url "https://dashscope-intl.aliyuncs.com"
     """
 
-    model: ModelEnum
-
     def __init__(self, api_key):
+        super().__init__()
         self.api_key = api_key
-
+        self.model: ModelEnum|None = None
     def as_embeddings(self, model=ModelEnum.EMBED):
         super().as_embeddings(model)
 
@@ -44,10 +43,7 @@ class API(AbstractClient):
         else:
             kwargs['messages'] = [
                 *self.messages,
-                {
-                    "role": "user",
-                    'content': user_prompt
-                }
+                MessageDict(role='user',content=user_prompt),
             ]
         # prompt 和 messages 是互斥的参数：如果你使用了 messages，就不要再传 prompt
         r = Generation.call(

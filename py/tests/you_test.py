@@ -5,7 +5,7 @@ from unittest import skipIf
 from youdotcom.models import ComputeTool, ResearchTool
 from youdotcom.types.typesafe_models import SearchEffort, Verbosity
 
-from davidkhala.ai.agent.you import Client
+from davidkhala.ai.you import Client
 
 api_key = os.environ.get('API_KEY')
 

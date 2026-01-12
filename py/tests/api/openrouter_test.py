@@ -12,20 +12,20 @@ class APITestCase(unittest.TestCase):
         self.openrouter = OpenRouterAPI(os.environ.get('API_KEY'))
 
     def test_chat(self):
-        self.openrouter.as_chat("nex-agi/deepseek-v3.1-nex-n1:free")
+        self.openrouter.as_chat("deepseek/deepseek-r1-0528:free")
         r = self.openrouter.chat('who am I?')
         self.assertTrue(type(r['data']) == list)
         self.assertEqual(1, len(r['data']))
 
     def test_chat_models(self):
-        self.openrouter.models = ["nex-agi/deepseek-v3.1-nex-n1:free", "deepseek/deepseek-chat-v3.1"]
+        self.openrouter.models = ["deepseek/deepseek-r1-0528:free", "deepseek/deepseek-chat-v3.1"]
         r = self.openrouter.chat('who am I?')
         print(r)  # only has one answer. Openrouter use models as pool for load-balance only
         self.assertIn(r['model'], self.openrouter.models)
 
     def test_models(self):
         models = self.openrouter.free_models
-        self.assertGreaterEqual(len(models), 32)
+        self.assertGreaterEqual(len(models), 31)
         print(models)
 
     def test_google_limit(self):

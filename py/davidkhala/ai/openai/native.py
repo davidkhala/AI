@@ -7,10 +7,11 @@ from davidkhala.ai.openai import Client
 
 class NativeClient(Client):
     def __init__(self, api_key, base_url=None):
-        self.client = OpenAI(
+        super().__init__(OpenAI(
             api_key=api_key,
             base_url=base_url
-        )
+        ))
+
 
     def chat(self, *user_prompt, web_search:Optional[Literal["low", "medium", "high"]]=None, **kwargs):
         opts = {

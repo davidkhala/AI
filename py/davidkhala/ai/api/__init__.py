@@ -8,7 +8,8 @@ from davidkhala.ai.model import AbstractClient
 
 class API(AbstractClient, Request):
     def __init__(self, api_key: str, base_url: str):
-        super().__init__({
+        AbstractClient.__init__(self)
+        Request.__init__(self,{
             "bearer": api_key
         })
         self.base_url = base_url + '/v1'

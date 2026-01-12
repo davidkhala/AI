@@ -16,6 +16,10 @@ class ClientProtocol(Protocol):
 
 class AbstractClient(ABC, ClientProtocol):
 
+    def __init__(self):
+        self.model = None
+        self.messages = []
+
     def as_chat(self, model: str, sys_prompt: str = None):
         self.model = model
         if sys_prompt is not None:
