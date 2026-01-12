@@ -4,6 +4,7 @@ from typing import Union, Literal
 from openai import OpenAI, AsyncOpenAI
 
 from davidkhala.ai.model import AbstractClient
+from davidkhala.ai.model.chat import on_response
 
 
 class Client(AbstractClient):
@@ -15,12 +16,13 @@ class Client(AbstractClient):
         try:
             type(self).models.fget(self)
             return True
-        except: # TODO make specific
+        except:  # TODO make specific
             return False
 
     @property
     def models(self):
         return self.client.models.list()
+
     def encode(self, *_input: str) -> list[list[float]]:
         response = self.client.embeddings.create(
             model=self.model,
@@ -57,11 +59,10 @@ class Client(AbstractClient):
             n=self.n,
             **kwargs
         )
-        contents = [choice.message.content for choice in response.choices]
-        assert len(contents) == self.n
-        return contents
 
-    def disconnect(self):
+        return on_response(response, self.n)
+
+    def close(self):
         self.client.close()
 
 

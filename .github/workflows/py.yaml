@@ -1,20 +1,22 @@
 on: push
 
 jobs:
-  you:
-    environment: you
+  studio:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [you, mistral]
+    environment: ${{matrix.platform}}
     env:
-      YOU_API_KEY: ${{secrets.YOU_API_KEY}}
+      API_KEY: ${{secrets.API_KEY}}
     steps:
       - uses: actions/checkout@main
       - uses: davidkhala/uv-buildpack@main
         with:
           working-directory: py
-          test-entry-point: pytest you_test.py
+          test-entry-point: pytest ${{matrix.platform}}_test.py
           tests: py/tests
-          extras: you
-
+          extras: ${{matrix.platform}}
   api:
     runs-on: ubuntu-latest
     strategy:

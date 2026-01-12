@@ -7,7 +7,7 @@ from youdotcom.types.typesafe_models import SearchEffort, Verbosity
 
 from davidkhala.ai.agent.you import Client
 
-api_key = os.environ.get('YOU_API_KEY')
+api_key = os.environ.get('API_KEY')
 
 
 class ChatTestCase(unittest.TestCase):
