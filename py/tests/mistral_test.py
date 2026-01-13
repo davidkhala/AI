@@ -1,14 +1,56 @@
-import unittest
-from davidkhala.ai.mistral import Client
 import os
-class ChatTest(unittest.TestCase):
+import unittest
+from pathlib import Path
+
+from mistralai import SDKError
+
+from davidkhala.ai.mistral.agent import Agents
+from davidkhala.ai.mistral.file import Client as FileClient
+from davidkhala.ai.mistral.ai import Client
+
+api_key = os.environ.get("API_KEY")
+
+
+class AITest(unittest.TestCase):
 
     def setUp(self):
-        api_key = os.environ.get("API_KEY")
         self.client = Client(api_key)
+
     def test_chat(self):
+        self.client.as_chat()
         message = "Who is the best French painter? Answer in one short sentence."
         print(self.client.chat(message))
+
+    def test_live_chat(self):
+        agents = Agents(api_key)
+        agents.as_chat()
+        agent = agents.create('football', web_search="web_search")
+        message = "Who won the last European Football cup?"
+        outputs, _ = agents.chat(agent.id, message)
+        for out in outputs:
+            print('--')
+            print(out)
+
+    def test_embedded(self):
+        self.client.as_embeddings()
+        r = self.client.encode("Embed this sentence.", "As well as this one.")
+        print(r)
+
+
+class FileTest(unittest.TestCase):
+    def setUp(self):
+        self.client = FileClient(api_key)
+
+    def test_list(self):
+        print(self.client.ls())
+
+    def test_upload(self):
+        with self.assertRaises(SDKError) as e:
+            self.client.upload(Path(__file__).parent / "fixtures" / "empty.jsonl")
+        self.assertEqual(422, e.exception.status_code)
+        self.assertEqual(
+            '{"detail": "Invalid file format.", "description": "Found 1 error in this file. You can view supported formats here: https://docs.mistral.ai/capabilities/finetuning.", "errors": [{"message": "1 validation error for FinetuningMessages messages   Input should be a valid list [type=list_type, input_value={}, input_type=dict]     For further information visit https://errors.pydantic.dev/2.11/v/list_type", "line_number": 1}]}',
+            e.exception.body)
 
 
 if __name__ == "__main__":

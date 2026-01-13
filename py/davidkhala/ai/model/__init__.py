@@ -13,8 +13,10 @@ class ClientProtocol(Protocol):
     model: str | None
     messages: list[MessageDict] | None
 
-
-class AbstractClient(ABC, ClientProtocol):
+class ChatProtocol(Protocol):
+    def as_chat(self, model: str, sys_prompt: str = None):...
+    def chat(self, *user_prompt, **kwargs):...
+class AbstractClient(ABC, ClientProtocol, ChatProtocol):
 
     def __init__(self):
         self.model = None
@@ -28,17 +30,18 @@ class AbstractClient(ABC, ClientProtocol):
     def as_embeddings(self, model: str):
         self.model = model
 
-    def chat(self, *user_prompt, **kwargs):
-        ...
-
     def encode(self, *_input: str) -> list[list[float]]:
         ...
 
-    def connect(self):
+    def connect(self)-> bool:
         ...
 
     def close(self):
         ...
+
+    def __enter__(self):
+        assert self.connect()
+        return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()

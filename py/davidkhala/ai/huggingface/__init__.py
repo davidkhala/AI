@@ -1,14 +1,13 @@
 import os
-from typing import Optional
 
 from huggingface_hub import snapshot_download
 
 
 def clone(git_dir: os.PathLike,
           *,
-          owner: Optional[str] = None,
-          repository: Optional[str] = None,
-          repo_id: Optional[str] = None,
+          owner: str|None = None,
+          repository: str|None = None,
+          repo_id: str|None = None,
           **kwargs
           ) -> str:
     if not repo_id:

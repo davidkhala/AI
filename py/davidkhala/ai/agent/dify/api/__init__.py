@@ -1,4 +1,4 @@
-from typing import Iterable, Callable, Any, Optional
+from typing import Iterable, Callable, Any
 
 from davidkhala.utils.http_request import Request
 
@@ -14,7 +14,7 @@ class Iterator(Iterable):
     def __iter__(self):
         return self
 
-    def __init__(self, get_fn: Callable[[int, int], Any], r: Optional[dict]):
+    def __init__(self, get_fn: Callable[[int, int], Any], r: dict|None):
         self.response = r
         self.fn = get_fn
 

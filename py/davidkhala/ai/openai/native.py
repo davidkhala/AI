@@ -1,4 +1,4 @@
-from typing import Optional, Literal
+from typing import Literal
 
 from openai import OpenAI
 
@@ -12,8 +12,7 @@ class NativeClient(Client):
             base_url=base_url
         ))
 
-
-    def chat(self, *user_prompt, web_search:Optional[Literal["low", "medium", "high"]]=None, **kwargs):
+    def chat(self, *user_prompt, web_search: Literal["low", "medium", "high"] = None, **kwargs):
         opts = {
             **kwargs
         }
