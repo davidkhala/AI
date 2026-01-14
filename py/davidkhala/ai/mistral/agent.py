@@ -2,11 +2,11 @@ from typing import Literal, Union
 
 from mistralai import Agent, ToolExecutionEntry, FunctionCallEntry, MessageOutputEntry, AgentHandoffEntry
 
-from davidkhala.ai.mistral import Client as BaseClient
+from davidkhala.ai.mistral import Client as MistralClient
 from davidkhala.ai.model.chat import messages_from
 
 
-class Agents(BaseClient):
+class Agents(MistralClient):
     def __init__(self, api_key):
         super().__init__(api_key)
         self.instructions: str | None = None

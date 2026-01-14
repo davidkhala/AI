@@ -2,15 +2,15 @@
 
 from mistralai import ResponseFormat
 
-from davidkhala.ai.mistral import Client as BaseClient
+from davidkhala.ai.mistral import Client as MistralClient
 from davidkhala.ai.model import AbstractClient as AIAware
 from davidkhala.ai.model.chat import on_response, messages_from
 
 
-class Client(AIAware, BaseClient):
+class Client(AIAware, MistralClient):
     def __init__(self, api_key: str):
         AIAware.__init__(self)
-        BaseClient.__init__(self, api_key)
+        MistralClient.__init__(self, api_key)
         self.n = 1
 
     def as_chat(self, model="mistral-large-latest", sys_prompt: str = None):
