@@ -39,5 +39,5 @@ class Client(AIAware, MistralClient):
         return [d.embedding for d in res.data]
 
     @property
-    def models(self):
-        self.client.models.list()
+    def models(self) -> list[str]:
+        return [_.id for _ in self.client.models.list().data]
