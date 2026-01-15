@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Protocol, TypedDict
+from typing import Protocol, TypedDict, Any
 
 
 class MessageDict(TypedDict):
@@ -13,14 +13,18 @@ class ClientProtocol(Protocol):
     model: str | None
     messages: list[MessageDict] | None
 
+
 class ChatProtocol(Protocol):
-    def as_chat(self, model: str, sys_prompt: str = None):...
-    def chat(self, *user_prompt, **kwargs):...
+    def as_chat(self, model: str, sys_prompt: str = None): ...
+
+    def chat(self, *user_prompt, **kwargs): ...
+
+
 class AbstractClient(ABC, ClientProtocol, ChatProtocol):
 
     def __init__(self):
         self.model = None
-        self.messages = []
+        self.messages: list[Any] = []
 
     def as_chat(self, model: str, sys_prompt: str = None):
         self.model = model
@@ -33,7 +37,7 @@ class AbstractClient(ABC, ClientProtocol, ChatProtocol):
     def encode(self, *_input: str) -> list[list[float]]:
         ...
 
-    def connect(self)-> bool:
+    def connect(self) -> bool:
         ...
 
     def close(self):

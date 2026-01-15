@@ -2,16 +2,14 @@ import base64
 import json
 from pathlib import Path
 
+from davidkhala.ml.ocr.interface import FieldProperties as BaseFieldProperties
 from mistralai import ImageURLChunk, ResponseFormat, JSONSchema
-from pydantic import BaseModel
 
 from davidkhala.ai.mistral import Client as MistralClient
 
 
-class FieldProperties(BaseModel):
-    required: bool = False
+class FieldProperties(BaseFieldProperties):
     description: str = ""
-    type: str = "string"
 
 
 class Client(MistralClient):
@@ -28,11 +26,12 @@ class Client(MistralClient):
             options['document_annotation_format'] = ResponseFormat(
                 type='json_schema',
                 json_schema=JSONSchema(
-                    name="response_schema",
+                    name='-',
                     schema_definition={
                         "required": required,
                         "properties": properties
-                    }
+                    },
+                    strict=True
                 )
             )
 

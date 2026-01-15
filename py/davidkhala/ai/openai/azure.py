@@ -1,6 +1,18 @@
+import base64
+import json
+from pathlib import Path
+
+from davidkhala.ml.ocr.interface import FieldProperties
 from davidkhala.utils.syntax.compat import deprecated
 from openai import AzureOpenAI, OpenAI
+from openai.types.chat import (
+    ChatCompletionUserMessageParam, ChatCompletionContentPartTextParam, ChatCompletionContentPartImageParam
+)
+from openai.types.chat.chat_completion_content_part_image_param import ImageURL
+from openai.types.shared_params import ResponseFormatJSONSchema
+from openai.types.shared_params.response_format_json_schema import JSONSchema
 
+from davidkhala.ai.model.chat import on_response
 from davidkhala.ai.openai import Client
 
 
@@ -19,6 +31,45 @@ class ModelDeploymentClient(AzureHosted):
             api_key=key,
         ))
 
+    def process(self, file: Path, schema: dict[str, FieldProperties])-> list[dict]:
+        with open(file, "rb") as f:
+            content = base64.b64encode(f.read()).decode("utf-8")
+        required = [k for k, _ in schema.items() if _.required]
+        properties = {k: {'type': v.type} for k, v in schema.items()}
+
+        json_schema = JSONSchema(
+            name='-',
+            schema={"type": "object",
+                    "properties": properties,
+                    "required": required,
+                    },
+        )
+
+        self.messages.append(ChatCompletionUserMessageParam(
+            role='user',
+            content=[
+                ChatCompletionContentPartTextParam(
+                    type='text',
+                    text="Extract the required fields from this image and return the output strictly following the provided JSON schema."),
+                ChatCompletionContentPartImageParam(
+                    type="image_url",
+                    image_url=ImageURL(
+                        url=f"data:image/jpeg;base64,{content}",
+                        detail='auto'
+                    )
+                )
+            ]
+        ))
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=self.messages,
+            response_format=ResponseFormatJSONSchema(
+                type='json_schema',
+                json_schema=json_schema
+            ),
+            n=self.n,
+        )
+        return [json.loads(_) for _ in on_response(response, self.n)]
 
 @deprecated("Azure Open AI is deprecated. Please migrate to Microsoft Foundry")
 class OpenAIClient(AzureHosted):

@@ -17,11 +17,11 @@ hf = [
     "huggingface_hub", 'hf_xet',
     'onnxruntime', 'onnx' # for test only
 ]
-mistral = ["mistralai"]
+mistral = ["mistralai", "davidkhala-ml-ocr"]
 you = ['youdotcom']
 openrouter = ["openrouter"]
 ali = ["dashscope", "wuying-agentbay-sdk", "davidkhala.utils"]
-azure = ["openai", "davidkhala.utils"]
+azure = ["openai", "davidkhala.utils", "davidkhala-ml-ocr"]
 telemetry = [
     "opik ; python_version < '3.14'" # limit py version:　PyO3 v0.22.6 currently supports up to Python 3.13.
 ]

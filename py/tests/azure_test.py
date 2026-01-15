@@ -37,6 +37,19 @@ class ModelDeploymentTestCase(unittest.TestCase):
         self.client.as_embeddings("text-embedding-3-large")
         print(self.client.encode("Attention is all you need"))
 
-
+    def test_ocr(self):
+        from pathlib import Path
+        file = Path(__file__).parent / "fixtures" / "transcript.png"
+        from davidkhala.ai.openai.azure import FieldProperties
+        schema = {
+            'Student': FieldProperties(required=True),
+            'Date of Birth': FieldProperties(required=True),
+            'Weighted GPA': FieldProperties(required=True),
+            'Gender': FieldProperties(required=True),
+            'Credits Earned': FieldProperties(),
+        }
+        self.client.as_chat("gpt-4o", "You are a professional OCR parser. Produce the output strictly according to the JSON schema")
+        r = self.client.process(file, schema)
+        print(r)
 if __name__ == '__main__':
     unittest.main()
