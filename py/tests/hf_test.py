@@ -5,7 +5,7 @@ import onnx
 import onnxruntime
 
 from davidkhala.ai.huggingface import clone
-from davidkhala.ai.huggingface.inference import API
+from davidkhala.ai.huggingface.legacy import API
 
 
 class BGETestCase(unittest.TestCase):
@@ -37,13 +37,23 @@ class BGETestCase(unittest.TestCase):
         onnxruntime.InferenceSession(onnx_path, sess_options)
 
 
-class InferenceTestCase(unittest.TestCase):
+class LegacyTestCase(unittest.TestCase):
     def test_sample(self):
         token = os.environ.get('PAT')
         i = API(token)
         i.as_model("google-bert/bert-base-uncased")
         r = i.call(inputs = "The goal of life is [MASK].", raw_response=True)
         print(r) # FIXME always 404
+        # TODO Is it due to legacy API?
+class ClientTestCase(unittest.TestCase):
+    def test_client_sample(self):
+        from davidkhala.ai.huggingface import Client
+        token = os.environ.get('PAT')
+        client = Client(api_key=token)
+        client.as_chat(model="Qwen/Qwen3-VL-8B-Instruct")
+        r = client.chat("Hello, how are you?")
+        print(r)
+        # TODO validate
 
 
 if __name__ == '__main__':

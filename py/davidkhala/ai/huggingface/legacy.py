@@ -1,6 +1,6 @@
 from huggingface_hub import InferenceApi
-
-
+from davidkhala.utils.syntax.compat import deprecated
+@deprecated("`from huggingface_hub import InferenceClient` is preferred since 2024")
 class API:
     def __init__(self, token):
         self.inference = None
