@@ -4,7 +4,6 @@ from abc import abstractmethod
 from davidkhala.utils.http_request import Request
 
 from davidkhala.ai.model import AbstractClient
-from davidkhala.ai.model.chat import messages_from
 
 
 class API(AbstractClient, Request):
@@ -21,13 +20,8 @@ class API(AbstractClient, Request):
         ...
 
     def chat(self, *user_prompt: str, **kwargs):
-        messages = [
-            *self.messages,
-            *messages_from(*user_prompt),
-        ]
-
         json = {
-            "messages": messages,
+            "messages": self.messages_from(*user_prompt),
             **kwargs,
         }
 

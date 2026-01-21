@@ -4,7 +4,7 @@ from mistralai import ResponseFormat
 
 from davidkhala.ai.mistral import Client as MistralClient
 from davidkhala.ai.model import AbstractClient as AIAware
-from davidkhala.ai.model.chat import on_response, messages_from
+from davidkhala.ai.model.chat import on_response
 
 
 class Client(AIAware, MistralClient):
@@ -22,10 +22,7 @@ class Client(AIAware, MistralClient):
     def chat(self, *user_prompt, **kwargs):
         response = self.client.chat.complete(
             model=self.model,
-            messages=[
-                *self.messages,
-                *messages_from(*user_prompt)
-            ], stream=False, response_format=ResponseFormat(type='text'),
+            messages=self.messages_from(*user_prompt), stream=False, response_format=ResponseFormat(type='text'),
             n=self.n,
         )
 

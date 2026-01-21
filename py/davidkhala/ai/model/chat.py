@@ -1,4 +1,4 @@
-from typing import Protocol, Any
+from typing import Protocol, Any, Iterable
 
 from davidkhala.ai.model import MessageDict
 
@@ -21,5 +21,14 @@ def on_response(response: ChoicesAware, n: int):
     return contents
 
 
-def messages_from(*user_prompt: str) -> list[MessageDict]:
-    return [MessageDict(role='user', content=_) for _ in user_prompt]
+def messages_from(*user_prompt: str|dict) -> Iterable[MessageDict]:
+
+    for _ in user_prompt:
+        message = MessageDict(role='user', content=None)
+        if type(_) == str:
+            message.content = _
+        elif type(_) == dict:
+            message.content = [{"type": "text", "text": _['text']}]
+            message.content.extend({"type": "image_url","image_url": {"url": i}} for i in _['image_url'])
+        yield message
+

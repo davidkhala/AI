@@ -41,10 +41,9 @@ class API(AbstractClient):
         if not self.messages:
             kwargs['prompt'] = user_prompt
         else:
-            kwargs['messages'] = [
-                *self.messages,
-                MessageDict(role='user',content=user_prompt),
-            ]
+            cloned = list(self.messages)
+            cloned.append(MessageDict(role='user',content=user_prompt))
+            kwargs['messages'] = cloned
         # prompt 和 messages 是互斥的参数：如果你使用了 messages，就不要再传 prompt
         r = Generation.call(
             self.model,

@@ -1,8 +1,10 @@
 import os
 
 from huggingface_hub import snapshot_download, InferenceClient
+
 from davidkhala.ai.model import AbstractClient
-from davidkhala.ai.model.chat import messages_from, on_response
+from davidkhala.ai.model.chat import on_response
+
 
 def clone(git_dir: os.PathLike,
           *,
@@ -29,7 +31,7 @@ class Client(AbstractClient):
     def chat(self, *user_prompt, **kwargs):
         r = self.client.chat.completions.create(
             model=self.model,
-            messages=self.messages + messages_from(*user_prompt),
+            messages=self.messages_from(*user_prompt),
             # TODO standardize image user prompt
             **kwargs,
         )

@@ -36,29 +36,9 @@ class Client(AbstractClient):
 
     def chat(self, *user_prompt, **kwargs):
 
-        messages = [
-            *self.messages,
-        ]
-        for prompt in user_prompt:
-            message = {
-                "role": "user"
-            }
-            if type(prompt) == str:
-                message['content'] = prompt
-            elif type(prompt) == dict:
-                message['content'] = [
-                    {"type": "text", "text": prompt['text']},
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": prompt['image_url'],
-                        }
-                    },
-                ]
-            messages.append(message)
         response = self.client.chat.completions.create(
             model=self.model,
-            messages=messages,
+            messages=self.messages_from(*user_prompt),
             n=self.n,
             **kwargs
         )
