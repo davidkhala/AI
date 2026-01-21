@@ -8,9 +8,9 @@ from davidkhala.ai.model.chat import on_response
 
 def clone(git_dir: os.PathLike,
           *,
-          owner: str|None = None,
-          repository: str|None = None,
-          repo_id: str|None = None,
+          owner: str | None = None,
+          repository: str | None = None,
+          repo_id: str | None = None,
           **kwargs
           ) -> str:
     if not repo_id:
@@ -25,16 +25,20 @@ def clone(git_dir: os.PathLike,
 
 class Client(AbstractClient):
     def __init__(self, api_key: str):
+        super().__init__()
         self.client = InferenceClient(
             api_key=api_key,
         )
+
     def chat(self, *user_prompt, **kwargs):
         r = self.client.chat.completions.create(
             model=self.model,
             messages=self.messages_from(*user_prompt),
-            # TODO standardize image user prompt
+            n=self.n,
             **kwargs,
         )
         return on_response(r, n=self.n)
 
-
+    def fill(self, template: str):
+        assert "[MASK]" in template
+        return [_.sequence for _ in self.client.fill_mask(template, model=self.model)]

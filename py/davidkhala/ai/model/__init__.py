@@ -16,6 +16,7 @@ class ChatAware:
     def __init__(self):
         self.model = None
         self.messages: list[Any | MessageDict] = []
+        self.n = 1
 
     def as_chat(self, model: str, sys_prompt: str = None):
         self.model = model
@@ -24,7 +25,7 @@ class ChatAware:
 
     def chat(self, *user_prompt, **kwargs): ...
 
-    def messages_from(self, *user_prompt: str) -> list[MessageDict]:
+    def messages_from(self, *user_prompt) -> list[MessageDict]:
         from davidkhala.ai.model.chat import messages_from
         messages = list(self.messages)
         messages.extend(messages_from(*user_prompt))
@@ -39,7 +40,7 @@ class EmbeddingAware:
         ...
 
 
-class AbstractClient(ClientProtocol, ChatAware, EmbeddingAware):
+class AbstractClient(ChatAware, EmbeddingAware, ClientProtocol):
 
     def connect(self) -> bool:
         ...
