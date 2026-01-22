@@ -1,0 +1,17 @@
+name: huggingface
+
+on: push
+
+jobs:
+  client:
+    runs-on: ubuntu-latest
+    environment: huggingface
+    env:
+      API_KEY: ${{secrets.API_KEY}}
+    steps:
+      - uses: actions/checkout@main
+      - uses: davidkhala/uv-buildpack@main
+        with:
+          working-directory: huggingface/py
+          tests: huggingface/py/tests
+

@@ -13,10 +13,7 @@ langchain = [
 ragflow = ["ragflow-sdk"]
 google = ["google-genai", "google-adk"]
 api = ["davidkhala.utils[http_request]"]
-hf = [
-    "huggingface_hub", 'hf_xet',
-    'onnxruntime', 'onnx', # for test only
-]
+
 mistral = ["mistralai", "davidkhala-ml-ocr"]
 you = ['youdotcom']
 openrouter = ["openrouter"]

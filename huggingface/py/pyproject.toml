@@ -4,14 +4,8 @@ version = "0.0.0"
 description = "huggingface modules"
 readme = "README.md"
 requires-python = ">=3.12"
-
+dependencies = ["huggingface_hub"]
 [project.optional-dependencies]
-
-
-hf = [
-    "huggingface_hub", 'hf_xet',
-    'onnxruntime', 'onnx', # for test only
-]
 
 
 [tool.hatch.build.targets.sdist]
@@ -26,5 +20,5 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
-    "pytest"
+    "pytest",'onnxruntime', 'onnx', # for test only
 ]

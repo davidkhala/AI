@@ -4,7 +4,7 @@ import unittest
 import onnx
 import onnxruntime
 
-from davidkhala.ai.huggingface import clone, Client
+from davidkhala.huggingface import Client
 
 
 

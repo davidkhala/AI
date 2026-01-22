@@ -1,12 +1,7 @@
-import os
-
-from huggingface_hub import snapshot_download, InferenceClient
+from huggingface_hub import InferenceClient
 
 from davidkhala.ai.model import AbstractClient
 from davidkhala.ai.model.chat import on_response
-
-
-
 
 
 class Client(AbstractClient):
