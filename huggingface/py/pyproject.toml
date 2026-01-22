@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = ["huggingface_hub"]
 [project.optional-dependencies]
+transformers = ["transformers[torch]", "hf_xet"]
 
 
 [tool.hatch.build.targets.sdist]
@@ -20,5 +21,9 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
-    "pytest",'onnxruntime', 'onnx', # for test only
+    "pytest"
 ]
+download = ['onnxruntime', 'onnx']
+DeepSeek-OCR = ["torchvision", "addict", "einops", "easydict"]
+# use `uv sync --no-build-isolation` and add flash-attn==2.7.3 if you need GPU
+

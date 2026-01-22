@@ -24,7 +24,7 @@ class GetStartedTestCase(unittest.TestCase):
             "You are a helpful assistant",
             get_weather
         )
-        r = agent.invoke("what is the weather in Hongkong")
+        r = agent.call("what is the weather in Hongkong")
 
         print(r) # TODO no actual response found
 

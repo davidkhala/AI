@@ -11,7 +11,7 @@ from davidkhala.huggingface.local import clone
 @skipIf(os.environ.get("CI"), "length test")
 class BGETestCase(unittest.TestCase):
     def test_snapshot(self):
-        path = clone('huggingface/bge_m3_model',
+        clone('huggingface/bge_m3_model',
                      owner="BAAI",
                      repository="bge-m3",
                      )

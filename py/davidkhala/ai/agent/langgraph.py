@@ -11,7 +11,7 @@ class Agent:
             prompt=instruction
         )
 
-    def invoke(self, content):
+    def call(self, content):
         return self.agent.invoke({"messages": [{"role": "user", "content": content}]})['messages'][-1]
 
 

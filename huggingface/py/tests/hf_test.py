@@ -1,13 +1,7 @@
 import os
 import unittest
 
-import onnx
-import onnxruntime
-
 from davidkhala.huggingface import Client
-
-
-
 
 
 class ClientTestCase(unittest.TestCase):
