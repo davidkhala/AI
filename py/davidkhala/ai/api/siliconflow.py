@@ -34,11 +34,9 @@ class SiliconFlow(API):
 
     def __init__(self, api_key: str):
         super().__init__(api_key, 'https://api.siliconflow.cn')
-        self.options['timeout'] = 50
 
-    def chat(self, *user_prompt: str, **kwargs):
-        kwargs['model'] = self.model
-        return super().chat(*user_prompt, **kwargs)
+    def chat(self, *user_prompt: str):
+        return super().chat(*user_prompt, model=self.model, timeout=50)
 
     def encode(self, *_input: str) -> list[list[float]]:
         json = {

@@ -12,13 +12,13 @@ class APITestCase(unittest.TestCase):
         self.openrouter = OpenRouterAPI(os.environ.get('API_KEY'))
 
     def test_chat(self):
-        self.openrouter.as_chat("deepseek/deepseek-r1-0528:free")
+        self.openrouter.as_chat("openrouter/free")
         r = self.openrouter.chat('who am I?')
         self.assertTrue(type(r['data']) == list)
         self.assertEqual(1, len(r['data']))
 
     def test_chat_models(self):
-        self.openrouter.models = ["deepseek/deepseek-r1-0528:free", "deepseek/deepseek-chat-v3.1"]
+        self.openrouter.as_chat("deepseek/deepseek-r1-0528:free", "deepseek/deepseek-chat-v3.1")
         r = self.openrouter.chat('who am I?')
         print(r)  # only has one answer. Openrouter use models as pool for load-balance only
         self.assertIn(r['model'], self.openrouter.models)
@@ -30,7 +30,7 @@ class APITestCase(unittest.TestCase):
 
     def test_google_limit(self):
         if os.environ.get('CI'):
-            self.skipTest("Gemini  is available in GitHub runner region")
+            self.skipTest("Gemini is available in GitHub runner region")
         for model in ['google/gemma-3n-e2b-it:free']:
             self.openrouter.as_chat(model)
             with self.assertRaises(HTTPError) as e:

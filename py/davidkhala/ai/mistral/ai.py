@@ -3,15 +3,15 @@
 from mistralai import ResponseFormat
 
 from davidkhala.ai.mistral import Client as MistralClient
-from davidkhala.ai.model import AbstractClient as AIAware
-from davidkhala.ai.model.chat import on_response
+from davidkhala.ai.model.embed import EmbeddingAware
+from davidkhala.ai.model.chat import on_response, ChatAware
 
 
-class Client(AIAware, MistralClient):
+class Client(ChatAware, EmbeddingAware, MistralClient):
     def __init__(self, api_key: str):
-        AIAware.__init__(self)
+        ChatAware.__init__(self)
         MistralClient.__init__(self, api_key)
-        self.n = 1
+
 
     def as_chat(self, model="mistral-large-latest", sys_prompt: str = None):
         super().as_chat(model, sys_prompt)

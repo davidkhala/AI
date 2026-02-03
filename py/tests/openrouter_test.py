@@ -16,8 +16,11 @@ class SDKTestCase(unittest.TestCase):
     def test_keys(self):
         print(self.admin.keys)
 
+    def test_models(self):
+        r = self.openrouter.models
+        print(r)
     def test_chat(self):
-        self.openrouter.as_chat('minimax/minimax-m2')
+        self.openrouter.as_chat('openrouter/free', sys_prompt='You are a shiny girl today')
         r = self.openrouter.chat('Hello!')
         print(r)
 

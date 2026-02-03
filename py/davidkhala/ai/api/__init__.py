@@ -1,23 +1,18 @@
 import datetime
-from abc import abstractmethod
 
 from davidkhala.utils.http_request import Request
 
-from davidkhala.ai.model import AbstractClient
+from davidkhala.ai.model.chat import ChatAware
+from davidkhala.ai.model.garden import GardenAlike
 
 
-class API(AbstractClient, Request):
+class API(ChatAware, Request, GardenAlike):
     def __init__(self, api_key: str, base_url: str):
-        AbstractClient.__init__(self)
-        Request.__init__(self,{
+        ChatAware.__init__(self)
+        Request.__init__(self, {
             "bearer": api_key
         })
         self.base_url = base_url + '/v1'
-
-    @property
-    @abstractmethod
-    def free_models(self) -> list[str]:
-        ...
 
     def chat(self, *user_prompt: str, **kwargs):
         json = {

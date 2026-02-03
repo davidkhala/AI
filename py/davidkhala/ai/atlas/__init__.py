@@ -1,9 +1,10 @@
 import voyageai
 
-from davidkhala.ai.model import EmbeddingAware
+from davidkhala.ai.model import SDKProtocol
+from davidkhala.ai.model.embed import EmbeddingAware
 
 
-class Client(EmbeddingAware):
+class Client(EmbeddingAware, SDKProtocol):
     def __init__(self, api_key):
         self.client = voyageai.Client(
             api_key=api_key,  # Or use VOYAGE_API_KEY environment variable

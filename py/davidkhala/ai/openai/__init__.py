@@ -1,20 +1,19 @@
 from typing import Literal
 
-from httpx import URL
 from openai import OpenAI
 
-from davidkhala.ai.model import AbstractClient
-from davidkhala.ai.model.chat import on_response
+from davidkhala.ai.model import SDKProtocol, Connectable
+from davidkhala.ai.model.embed import EmbeddingAware
+from davidkhala.ai.model.chat import on_response, ChatAware
+from davidkhala.ai.model.garden import GardenAlike
 
 
-class Client(AbstractClient):
+class Client(ChatAware, EmbeddingAware, SDKProtocol, GardenAlike, Connectable):
     def __init__(self, client: OpenAI):
         super().__init__()
-        self.client:OpenAI = client
-        self.base_url:URL = client.base_url
-        self.api_key = client.api_key
-        self.encoding_format:Literal["float", "base64"] = "float"
-        self.n:int = 1
+        self.client: OpenAI = client
+        self.encoding_format: Literal["float", "base64"] = "float"
+
     def connect(self):
         try:
             type(self).models.fget(self)
@@ -47,6 +46,3 @@ class Client(AbstractClient):
 
     def close(self):
         self.client.close()
-
-
-

@@ -1,10 +1,10 @@
 from huggingface_hub import InferenceClient
 
-from davidkhala.ai.model import AbstractClient
-from davidkhala.ai.model.chat import on_response
+from davidkhala.ai.model import SDKProtocol
+from davidkhala.ai.model.chat import on_response, ChatAware
 
 
-class Client(AbstractClient):
+class Client(ChatAware, SDKProtocol):
     def __init__(self, api_key: str):
         super().__init__()
         self.client = InferenceClient(

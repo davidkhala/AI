@@ -4,7 +4,9 @@ from http import HTTPStatus
 from dashscope.api_entities.dashscope_response import DashScopeAPIResponse
 
 from dashscope import Generation, TextEmbedding
-from davidkhala.ai.model import AbstractClient, MessageDict
+from davidkhala.ai.model import ClientProtocol
+from davidkhala.ai.model.embed import EmbeddingAware
+from davidkhala.ai.model.chat import MessageDict, ChatAware
 
 
 class ModelEnum(str, Enum):
@@ -16,7 +18,7 @@ class ModelEnum(str, Enum):
     EMBED = TextEmbedding.Models.text_embedding_v4
 
 
-class API(AbstractClient):
+class API(ChatAware, EmbeddingAware, ClientProtocol):
     """
     Unsupported to use international base_url "https://dashscope-intl.aliyuncs.com"
     """
@@ -24,17 +26,17 @@ class API(AbstractClient):
     def __init__(self, api_key):
         super().__init__()
         self.api_key = api_key
-        self.model: ModelEnum|None = None
+        self.model: ModelEnum | None = None
+
     def as_embeddings(self, model=ModelEnum.EMBED):
         super().as_embeddings(model)
 
     @staticmethod
-    def _on_response(response:DashScopeAPIResponse):
+    def _on_response(response: DashScopeAPIResponse):
         if response.status_code == HTTPStatus.OK:
             return response.output
         else:
             raise Exception(response)
-
 
     def chat(self, user_prompt: str, **kwargs):
 
@@ -42,7 +44,7 @@ class API(AbstractClient):
             kwargs['prompt'] = user_prompt
         else:
             cloned = list(self.messages)
-            cloned.append(MessageDict(role='user',content=user_prompt))
+            cloned.append(MessageDict(role='user', content=user_prompt))
             kwargs['messages'] = cloned
         # prompt 和 messages 是互斥的参数：如果你使用了 messages，就不要再传 prompt
         r = Generation.call(
@@ -52,10 +54,10 @@ class API(AbstractClient):
         )
         return API._on_response(r)
 
-    def encode(self, *_input: str)-> list[list[float]]:
-        r= TextEmbedding.call(
-            self.model,list(_input),
-            api_key= self.api_key,
+    def encode(self, *_input: str) -> list[list[float]]:
+        r = TextEmbedding.call(
+            self.model, list(_input),
+            api_key=self.api_key,
         )
         r = API._on_response(r)
 
