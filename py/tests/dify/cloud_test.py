@@ -7,7 +7,9 @@ from davidkhala.utils.syntax.path import resolve
 from requests import HTTPError
 
 from davidkhala.ai.agent.dify.api.app import Feedbacks, Conversation
-from davidkhala.ai.agent.dify.api.knowledge import Dataset, Document, Chunk
+from davidkhala.ai.agent.dify.api.knowledge.dataset import Dataset
+from davidkhala.ai.agent.dify.api.knowledge.chunk import Chunk
+from davidkhala.ai.agent.dify.api.knowledge.document import Document
 
 
 class CloudTest(unittest.TestCase):
@@ -26,9 +28,11 @@ class DatasetTest(CloudTest):
             print(_id)
 
     def test_get(self):
-        id = '733e7159-2963-462d-b839-9c54d5f33a7e'
-        instance = Dataset.Instance(self.client, id)
-        print(instance.get())
+        _id = '8bae26cb-a2be-4487-8492-04554a4f7b8b'
+        instance = Dataset.Instance(self.client, _id).get()
+        print(instance)
+        self.assertEqual('8de9da97-a36a-4ad8-a316-0d521d043c29', instance.pipeline_id)
+
 
 
 class DocumentTest(CloudTest):
@@ -61,7 +65,7 @@ class DocumentTest(CloudTest):
         with self.assertRaises(HTTPError) as context:
             self.client.upload(None, url=img_url)
         self.assertEqual(context.exception.response.status_code, 400)
-        # html should be supported
+        # HTML should be supported
         html_path = resolve(__file__,
                             "../fixtures/About THEi - Technological and Higher Education Institute of Hong Kong.html")
         with self.assertRaises(HTTPError) as context:

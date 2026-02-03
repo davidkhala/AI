@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from davidkhala.ai.agent.dify.const import IndexingStatus
 
@@ -18,14 +18,3 @@ class Dataset(BaseModel):
     id: str
     name: str
     description: str
-
-
-class JsonData(BaseModel):
-    data: list
-
-
-class NodeOutput(BaseModel):
-    """Schema for Output of a Dify node"""
-    text: str
-    files: list
-    json_: list[JsonData] = Field(alias="json") # avoid conflict with .json()

@@ -9,7 +9,7 @@ class HotmailFreeEdition(unittest.TestCase):
     client = Client(host, token)
     def test_models(self):
         with self.assertRaises(NotFoundError) as e:
-            self.client.models()
+            _=self.client.models
         self.assertEqual(e.exception.status_code, 404)
         self.assertEqual("Error code: 404 - {'error_code': 'ENDPOINT_NOT_FOUND', 'message': 'Path must be of form /serving-endpoints/<endpoint_name>/invocations or /serving-endpoints/<endpoint_name>/served-models/<served_model_name>/invocations'}", e.exception.message)
 

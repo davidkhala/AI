@@ -4,12 +4,13 @@ import unittest
 
 from davidkhala.ai.agent.dify.interface import IndexingError
 from davidkhala.ai.agent.dify.const import IndexingStatus
-from davidkhala.ai.agent.dify.ops.console.knowledge import Datasource, Operation, Load
-from davidkhala.ai.agent.dify.ops.console.session import ConsoleUser
-from davidkhala.ai.agent.dify.ops.db.app import Studio
-from davidkhala.ai.agent.dify.ops.db.knowledge import Dataset, Document, Pipeline
-from davidkhala.ai.agent.dify.ops.db.sys import Info
-from davidkhala.ai.agent.dify.ops.console.plugin import ConsolePlugin
+from davidkhala.ai.agent.dify.console.knowledge.pipeline import Datasource, Pipeline
+from davidkhala.ai.agent.dify.console.knowledge.dataset import Operation
+from davidkhala.ai.agent.dify.console.session import ConsoleUser
+from davidkhala.ai.agent.dify.db.app import Studio
+from davidkhala.ai.agent.dify.db.knowledge import Dataset, Document, Pipeline
+from davidkhala.ai.agent.dify.db.sys import Info
+from davidkhala.ai.agent.dify.console.plugin import ConsolePlugin
 
 class DBTest(unittest.TestCase):
     def setUp(self):
@@ -117,7 +118,7 @@ class ConsoleTest(unittest.TestCase):
             "subpage": False,
             "pages": 1
         }, credential_id=credential_id)
-        load = Load(self.console)
+        load = Pipeline(self.console)
         print('--run_firecrawl completed')
         from davidkhala.ai.agent.dify.plugins.firecrawl import Console
 

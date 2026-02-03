@@ -1,15 +1,12 @@
 from time import sleep
 
-from davidkhala.ai.agent.dify.ops.console import API
-from davidkhala.ai.agent.dify.ops.console.session import ConsoleUser
+from davidkhala.ai.agent.dify.console.session import ConsoleUser, ConsoleDerived
 
 
-class ConsolePlugin(API):
+class ConsolePlugin(ConsoleDerived):
     def __init__(self, context: ConsoleUser):
-        super().__init__()
+        super().__init__(context)
         self.base_url = f"{context.base_url}/workspaces/current/plugin"
-        self.session.cookies = context.session.cookies
-        self.options = context.options
 
     def upgrade(self, *plugin_names: str) -> list[dict]:
         versions = self.latest_version(*plugin_names)
@@ -66,3 +63,20 @@ class ConsolePlugin(API):
         for name in plugin_names:
             r = self.get(name)
             self.uninstall(r[0]['id'])
+
+
+class ConsoleTool(ConsoleDerived):
+    def __init__(self, context: ConsoleUser):
+        super().__init__(context)
+        self.base_url = f"{context.base_url}/workspaces/current/tool-provider"
+
+    def credential_id_by(self, name, owner: str, plugin: str):
+        for c in self.credentials_of(owner, plugin):
+            if c['name'] == name:
+                return c['id']
+        return None
+
+    def credentials_of(self, owner: str, plugin: str):
+        url = f"{self.base_url}/builtin/{owner}/{plugin}/{plugin}/credential/info"
+        r = self.request(url, method="GET")
+        return r['credentials']

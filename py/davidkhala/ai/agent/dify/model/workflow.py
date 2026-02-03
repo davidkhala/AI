@@ -1,65 +1,33 @@
-import json
 from enum import Enum
-from typing import Any, Literal
+from typing import Protocol, Literal, Any, Optional
 
-from pydantic import BaseModel
-from sqlalchemy import Column, String, Text, JSON, TIMESTAMP, func
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import declarative_base
-
-Base = declarative_base()
+from pydantic import BaseModel, Field
 
 
-class DifyBase(Base):
-    __abstract__ = True  # keyword for SQLAlchemy
-    id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.uuid_generate_v4())
 
 
-class AppModelConfig(DifyBase):
-    __tablename__ = "app_model_configs"
-    __table_args__ = {"schema": "public"}
-
-    app_id = Column(UUID(as_uuid=True), nullable=False)
-
-    provider = Column(String(255))
-    model_id = Column(String(255))
-    configs = Column(JSON)
-
-    created_at = Column(TIMESTAMP, nullable=False, server_default=func.current_timestamp())
-    updated_at = Column(TIMESTAMP, nullable=False, server_default=func.current_timestamp())
-
-    opening_statement = Column(Text)
-    suggested_questions = Column(Text)
-    suggested_questions_after_answer = Column(Text)
-    more_like_this = Column(Text)
-    model = Column(Text)
-    user_input_form = Column(Text)
-    pre_prompt = Column(Text)
-    agent_mode = Column(Text)
-    speech_to_text = Column(Text)
-    sensitive_word_avoidance = Column(Text)
-    retriever_resource = Column(Text)
-
-    dataset_query_variable = Column(String(255))
-    prompt_type = Column(String(255), nullable=False, server_default="simple")
-
-    chat_prompt_config = Column(Text)
-    completion_prompt_config = Column(Text)
-    dataset_configs = Column(Text)
-    external_data_tools = Column(Text)
-    file_upload = Column(Text)
-    text_to_speech = Column(Text)
-
-    created_by = Column(UUID(as_uuid=True))
-    updated_by = Column(UUID(as_uuid=True))
-
-    def __repr__(self):
-        return f"<AppModelConfig(id={self.id}, app_id={self.app_id}, provider={self.provider}, model_id={self.model_id})>"
+class NodeProtocol(Protocol):
+    id:str
+    datasource_type: str
 
 
 class Position(BaseModel):
     x: float
     y: float
+class Viewport(Position):
+    zoom: float
+
+class JsonData(BaseModel):
+    data: list
+
+
+class NodeOutput(BaseModel):
+    """Schema for Output of a Dify node"""
+    text: str
+    files: list
+    json_: list[JsonData] = Field(alias="json") # avoid conflict with .json()
+
+
 
 
 class NodeData(BaseModel):
@@ -104,7 +72,6 @@ class NodeData(BaseModel):
     embedding_model: str | None = None
     embedding_model_provider: str | None = None
 
-
 class Node(BaseModel):
     @property
     def datasource_type(self): return self.data.provider_type
@@ -117,9 +84,13 @@ class Node(BaseModel):
     positionAbsolute: Position | None = None
     width: float | None = None
     height: float | None = None
-    selected: bool
+    selected: bool | None = False
 
-
+class EdgeData(BaseModel):
+    sourceType: str | None = None
+    targetType: str | None = None
+    isInIteration: bool | None = False
+    isInLoop: bool | None = False
 class Edge(BaseModel):
     id: str
     type: str
@@ -127,14 +98,8 @@ class Edge(BaseModel):
     target: str
     sourceHandle: str | None = None
     targetHandle: str | None = None
-    data: dict[str, Any] | None = None
+    data: EdgeData | None = None
     zIndex: int | None = None
-
-
-class Viewport(BaseModel):
-    x: float
-    y: float
-    zoom: float
 
 
 class Graph(BaseModel):
@@ -146,6 +111,3 @@ class Graph(BaseModel):
     def datasources(self):
         return [node for node in self.nodes if node.data.type == NodeData.Type.SOURCE]
 
-    @staticmethod
-    def convert(*records: list[dict]):
-        return [{**record, "graph": Graph(**json.loads(record["graph"]))} for record in records]
