@@ -9,5 +9,7 @@ An Agent Node is a component in Dify Chatflow/Workflow that enables autonomous t
 - `ReAct`
   - 模型先思考（Thought），再决定行动（Action），再根据 Observation 继续推理。 
 
+Context (setting)
+- 
 ## Limit
 It don't have knowledge that link to your knowledge base

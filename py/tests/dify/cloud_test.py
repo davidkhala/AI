@@ -110,7 +110,7 @@ class DocumentTest(CloudTest):
         doc.delete()
 
 class ChatAppTest(unittest.TestCase):
-    api_key = os.getenv('APP_API_KEY') or 'app-fZVszIQWFFSUBLiSR2DE7Un3'
+    api_key = os.getenv('APP_API_KEY')
 
     def test_list_feedback(self):
         f = Feedbacks(self.api_key)
@@ -128,7 +128,7 @@ class ChatAppTest(unittest.TestCase):
         api_key = os.getenv('AGENT_API_KEY')
         c = Conversation(api_key, me)
         r = c.agent_chat("What are the specs of the iPhone 13 Pro Max?")
-        print(r)
+        print(r['thought'])
     def test_bot_chat(self):
         me = '45bdc865-6d71-40ab-8892-af53906362fa'
         api_key = os.getenv('BOT_API_KEY')
