@@ -77,12 +77,16 @@ class Conversation(API):
         r: Conversation.ChatResult = {
             'thought': [],
         }
-        for data in as_sse(response):
-            match data['event']:
-                case 'agent_thought':
-                    r['thought'].append(data['thought'])
-                case 'message_end':
-                    r['metadata'] = data['metadata']
+
+        for line in response.iter_lines():
+            if line and line != b'event: ping':
+                data = json.loads(line[5:].decode())
+                match data['event']:
+                    case 'agent_thought':
+                        r['thought'].append(data['thought'])
+                    case 'message_end':
+                        r['metadata'] = data['metadata']
+
         return r
 
     def agent_chat(self, template: str, **kwargs) -> ChatResult:

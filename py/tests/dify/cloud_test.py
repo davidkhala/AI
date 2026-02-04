@@ -1,4 +1,3 @@
-
 import os
 import unittest
 from datetime import datetime
@@ -32,7 +31,6 @@ class DatasetTest(CloudTest):
         instance = Dataset.Instance(self.client, _id).get()
         print(instance)
         self.assertEqual('8de9da97-a36a-4ad8-a316-0d521d043c29', instance.pipeline_id)
-
 
 
 class DocumentTest(CloudTest):
@@ -109,6 +107,7 @@ class DocumentTest(CloudTest):
         doc = Document(self.client, doc_id)
         doc.delete()
 
+
 class ChatAppTest(unittest.TestCase):
     api_key = os.getenv('APP_API_KEY')
 
@@ -129,6 +128,7 @@ class ChatAppTest(unittest.TestCase):
         c = Conversation(api_key, me)
         r = c.agent_chat("What are the specs of the iPhone 13 Pro Max?")
         print(r['thought'])
+
     def test_bot_chat(self):
         me = '45bdc865-6d71-40ab-8892-af53906362fa'
         api_key = os.getenv('BOT_API_KEY')
