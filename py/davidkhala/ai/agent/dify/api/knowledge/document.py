@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from typing import Iterable
+from typing import Iterable, Literal
 
 import requests
 
 from davidkhala.ai.agent.dify.api import API, Iterator
 from davidkhala.ai.agent.dify.api.knowledge.dataset import Dataset
-from davidkhala.ai.agent.dify.api.knowledge.model import ChunkDict
+from davidkhala.ai.agent.dify.api.knowledge.model import ChunkDict, DocumentModel, MetadataDocumentModel, \
+    NonMetadataDocumentModel
 
 
 class Document(API):
@@ -23,8 +24,23 @@ class Document(API):
             else:
                 raise e
 
-    def get(self):
-        return self.request(self.base_url, "GET")
+    def get(self,
+            metadata: Literal['all', 'only', 'without'] = 'all'
+            ) -> DocumentModel | MetadataDocumentModel | NonMetadataDocumentModel:
+        """
+        :param metadata:
+            - 'only' returns metadata
+            - 'without' returns anything without metadata
+        """
+
+        r = self.request(f"{self.base_url}?metadata={metadata}", "GET")
+        match metadata:
+            case 'only':
+                return MetadataDocumentModel.model_validate(r)
+            case 'without':
+                return NonMetadataDocumentModel.model_validate(r)
+
+        return DocumentModel.model_validate(r)
 
     def paginate_chunks(self, page=1, size=20):
         return self.request(f"{self.base_url}/segments", "GET", params={

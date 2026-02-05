@@ -23,6 +23,10 @@ class DatasetTest(CloudTest):
         self.client = Dataset(self.api_key)
 
     def test_list(self):
+        for dataset in self.client.list_datasets():
+            print(dataset)
+
+    def test_list_ids(self):
         for _id in self.client.ids:
             print(_id)
 
@@ -36,7 +40,7 @@ class DatasetTest(CloudTest):
 class DocumentTest(CloudTest):
     def setUp(self):
         super().setUp()
-        dataset_id = '733e7159-2963-462d-b839-9c54d5f33a7e'
+        dataset_id = '8bae26cb-a2be-4487-8492-04554a4f7b8b'
         self.client = Dataset.Instance(Dataset(self.api_key), dataset_id)
 
     def test_upload_readme(self):
@@ -70,10 +74,21 @@ class DocumentTest(CloudTest):
             self.client.upload(None, path=html_path)
         self.assertEqual(context.exception.response.status_code, 403)
 
+    def test_get(self):
+        doc_id = 'e97a986b-9613-4f09-a8b2-d069f94bd1f9'
+        doc = Document(self.client, doc_id)
+        doc.get('without')
+        doc.get('only')
+        it = doc.get('all')
+
+        print(it.custom_metadata)
+    def test_set_metadata(self):
+        # TODO set metadata by batch
+        ...
     def test_list(self):
         for doc in self.client.list_documents():
             # doc has content, can be lengthy
-            print(doc['name'])
+            print(doc.name)
 
     def test_has(self):
         name = 'Admission - Technological and Higher Education Institute of Hong Kong.html'
@@ -109,7 +124,8 @@ class DocumentTest(CloudTest):
 
 
 class ChatAppTest(unittest.TestCase):
-    api_key = os.getenv('APP_API_KEY')
+    def setUp(self):
+        self.api_key = os.getenv('APP_API_KEY')
 
     def test_list_feedback(self):
         f = Feedbacks(self.api_key)
@@ -125,9 +141,10 @@ class ChatAppTest(unittest.TestCase):
     def test_agent_chat(self):
         me = '45bdc865-6d71-40ab-8892-af53906362fa'
         api_key = os.getenv('AGENT_API_KEY')
+
         c = Conversation(api_key, me)
         r = c.agent_chat("What are the specs of the iPhone 13 Pro Max?")
-        print(r['thought'])
+        print(r['answer'] in r['thought'], r['answer'])
 
     def test_bot_chat(self):
         me = '45bdc865-6d71-40ab-8892-af53906362fa'

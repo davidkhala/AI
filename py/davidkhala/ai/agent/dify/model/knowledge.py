@@ -1,10 +1,8 @@
-from pydantic import BaseModel
-
 from davidkhala.ai.agent.dify.const import IndexingStatus
+from davidkhala.ai.agent.dify.model import ID
 
 
-class Document(BaseModel):
-    id: str
+class Document(ID):
     position: int
     data_source_type: str
     data_source_info: dict[str, str]
@@ -14,7 +12,6 @@ class Document(BaseModel):
     enabled: bool
 
 
-class Dataset(BaseModel):
-    id: str
+class Dataset(ID):
     name: str
     description: str

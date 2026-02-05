@@ -16,26 +16,28 @@ class Dataset(API):
         super().__init__(api_key, f"{base_url}/datasets")
 
     def paginate_datasets(self, page=1, size=20):
+        assert 0 < size < 101
         r = self.request(self.base_url, "GET", params={
             'page': page,
             'limit': size,
         })
         return r
 
-    def list_datasets(self) -> Iterable[list[DatasetModel]]:
-        return Iterator(self.paginate_datasets, None)
+    def list_datasets(self) -> Iterable[DatasetModel]:
+        for sub_list in Iterator(self.paginate_datasets, None):
+            for dataset in sub_list:
+                yield DatasetModel.model_validate(dataset)
 
     @property
     def ids(self):
-        for sub_list in self.list_datasets():
-            for dataset in sub_list:
-                yield dataset['id']
+        for dataset in self.list_datasets():
+            yield dataset.id
 
     class Instance(API):
         def __init__(self, d: Dataset, dataset_id: str):
             super().__init__(d.api_key, f"{d.base_url}/{dataset_id}")
 
-        def get(self)-> DatasetModel:
+        def get(self) -> DatasetModel:
             d = self.request(self.base_url, "GET")
             return DatasetModel.model_validate(d)
 

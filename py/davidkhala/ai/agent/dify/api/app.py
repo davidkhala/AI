@@ -71,13 +71,14 @@ class Conversation(API):
     class ChatResult(TypedDict, total=False):
         thought: list[str]
         metadata: dict
+        answer: str
 
     @staticmethod
     def reduce_chat_stream(response: Response) -> ChatResult:
         r: Conversation.ChatResult = {
             'thought': [],
         }
-
+        answers = []
         for line in response.iter_lines():
             if line and line != b'event: ping':
                 data = json.loads(line[5:].decode())
@@ -86,7 +87,9 @@ class Conversation(API):
                         r['thought'].append(data['thought'])
                     case 'message_end':
                         r['metadata'] = data['metadata']
-
+                    case 'agent_message':
+                        answers.append(data['answer'])
+        r['answer'] = ''.join(answers)
         return r
 
     def agent_chat(self, template: str, **kwargs) -> ChatResult:

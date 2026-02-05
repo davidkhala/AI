@@ -44,7 +44,7 @@ class ConsolePlugin(ConsoleDerived):
         })
         return r['plugins']
 
-    def latest_version(self, *plugin_names: str) -> dict:
+    def latest_version(self, *plugin_names: str) -> list[str]:
         url = f"{self.base_url}/list/latest-versions"
         r = self.request(url, method="POST", json={
             'plugin_ids': plugin_names,

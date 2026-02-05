@@ -8,7 +8,9 @@ from davidkhala.ai.agent.dify.interface import IndexingError
 class Operation(ConsoleDerived):
     def website_sync(self, dataset: str, document: str, *, wait_until=True):
         """
+        for dataset with runtime_mode=standard
         cannot be used towards a pipeline dataset. Otherwise, you will see error "no website import info found"
+        It can be used to force document into error status
         """
         doc_url = f"{self.base_url}/datasets/{dataset}/documents/{document}"
 
@@ -45,6 +47,7 @@ class Operation(ConsoleDerived):
                    from_status=None,
                    interval=1
                    ):
+        # TODO this has public api version in https://docs.dify.ai/api-reference/documents/get-document-embedding-status-progress
         if not expect_status:
             expect_status = [IndexingStatus.FAILED, IndexingStatus.COMPLETED]
         url = f"{self.base_url}/datasets/{dataset}/documents/{document}/indexing-status"

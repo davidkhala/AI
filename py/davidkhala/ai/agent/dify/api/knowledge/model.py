@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from typing import List, Any, TypedDict
+from typing import List, Any, TypedDict, Literal
 
 from pydantic import BaseModel
 
+from davidkhala.ai.agent.dify.model import ID
 from davidkhala.ai.agent.dify.model.knowledge import Document as DocumentBase
 
 
@@ -53,7 +54,7 @@ class ExternalRetrievalModel(BaseModel):
 
 
 class IconInfo(BaseModel):
-    icon_type: str
+    icon_type: str | None
     icon: str | None
     icon_background: str | None
     icon_url: str | None
@@ -86,7 +87,7 @@ class DatasetModel(BaseModel):
     doc_metadata: List[Any] = []
     built_in_field_enabled: bool
     pipeline_id: str | None = None
-    runtime_mode: str | None = None
+    runtime_mode: Literal['rag_pipeline', 'standard']
     chunk_structure: str | None = None
     icon_info: IconInfo | None = None
     is_published: bool
@@ -96,23 +97,65 @@ class DatasetModel(BaseModel):
     is_multimodal: bool
 
 
-class DocumentModel(DocumentBase):
-    data_source_info: dict[str, str]
-    data_source_detail_dict: dict[str, dict]
+class RulesModel(BaseModel):
+    parent_mode: str
+
+
+class DatasetProcessRuleModel(BaseModel):
+    mode: str
+    rules: RulesModel
+
+
+class DocMetadataModel(BaseModel):
+    id: Literal['built-in'] | str
+    name: str
+    type: str
+    value: Any
+
+
+class DocumentProcessRuleModel(BaseModel):
+    id: str
+    dataset_id: str
+    mode: str
+    rules: RulesModel
+
+
+class MetadataDocumentModel(ID):
+    doc_type: str | None
+    doc_metadata: list[DocMetadataModel] | None
+
+    @property
+    def custom_metadata(self) -> list[dict[str, Any]] | None:
+        if not self.doc_metadata:
+            return None
+        return [{_.name: _.value} for _ in self.doc_metadata if _.id != 'built-in']
+
+
+class NonMetadataDocumentModel(DocumentBase):
     dataset_process_rule_id: str
+    dataset_process_rule: DatasetProcessRuleModel
+    document_process_rule: DocumentProcessRuleModel
     created_from: str
     created_by: str
     created_at: int
-    tokens: int
+    tokens: int | None
+    completed_at: int | None
+    updated_at: int
+    indexing_latency: float | None
+    disabled_at: int | None
+    disabled_by: str | None
     archived: bool
-    display_status: str
-    word_count: int
+    segment_count: int
+    average_segment_length: int
     hit_count: int
+    display_status: str
     doc_form: str
-    doc_metadata: dict
-    disabled_at: int
-    disabled_by: str
+    doc_language: str | None
+    summary_index_status: str | None
+    need_summary: bool
 
+
+class DocumentModel(NonMetadataDocumentModel, MetadataDocumentModel):...
 
 class ChunkDict(TypedDict):
     id: str
