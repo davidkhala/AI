@@ -33,7 +33,9 @@ class Document(API):
             - 'without' returns anything without metadata
         """
 
-        r = self.request(f"{self.base_url}?metadata={metadata}", "GET")
+        r = self.request(self.base_url, "GET", params={
+            'metadata': metadata
+        })
         match metadata:
             case 'only':
                 return MetadataDocumentModel.model_validate(r)
@@ -42,14 +44,16 @@ class Document(API):
 
         return DocumentModel.model_validate(r)
 
-    def paginate_chunks(self, page=1, size=20):
+    def paginate_chunks(self, page=1, size=20, keyword=None):
+        assert 0 < size < 101
         return self.request(f"{self.base_url}/segments", "GET", params={
             'page': page,
-            'limit': size
+            'limit': size,
+            'keyword': keyword
         })
 
-    def list_chunks(self) -> Iterable[ChunkDict]:
-        for chunk_batch in Iterator(self.paginate_chunks, None):
+    def list_chunks(self, keyword=None) -> Iterable[ChunkDict]:
+        for chunk_batch in Iterator(self.paginate_chunks, keyword=keyword):
             for chunk in chunk_batch:
                 yield chunk
 

@@ -23,7 +23,7 @@ class DatasetTest(CloudTest):
         self.client = Dataset(self.api_key)
 
     def test_list(self):
-        for dataset in self.client.list_datasets():
+        for dataset in self.client.list_datasets('Thei'):
             print(dataset)
 
     def test_list_ids(self):
@@ -82,9 +82,6 @@ class DocumentTest(CloudTest):
         it = doc.get('all')
 
         print(it.custom_metadata)
-    def test_set_metadata(self):
-        # TODO set metadata by batch
-        ...
     def test_list(self):
         for doc in self.client.list_documents():
             # doc has content, can be lengthy
@@ -104,7 +101,7 @@ class DocumentTest(CloudTest):
         self.assertFalse(doc.exist())
 
     def test_chunks(self):
-        doc_id = '3568dd90-fe30-4df3-8cc3-9f8a1cb9ee06'
+        doc_id = 'e97a986b-9613-4f09-a8b2-d069f94bd1f9'
         doc = Document(self.client, doc_id)
         for chunk in doc.list_chunks():
             print(chunk['sign_content'])

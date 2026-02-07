@@ -106,11 +106,14 @@ class DatasetProcessRuleModel(BaseModel):
     rules: RulesModel
 
 
+MetadataType = Literal['string', 'number', 'time']
+
 class DocMetadataModel(BaseModel):
     id: Literal['built-in'] | str
     name: str
-    type: str
-    value: Any
+    type: MetadataType
+    value: Any | None = None # not used in definition
+    count: int | None = None # used in definition
 
 
 class DocumentProcessRuleModel(BaseModel):
@@ -121,8 +124,8 @@ class DocumentProcessRuleModel(BaseModel):
 
 
 class MetadataDocumentModel(ID):
-    doc_type: str | None
-    doc_metadata: list[DocMetadataModel] | None
+    doc_type: str | None = None
+    doc_metadata: list[DocMetadataModel]
 
     @property
     def custom_metadata(self) -> list[dict[str, Any]] | None:
@@ -133,29 +136,30 @@ class MetadataDocumentModel(ID):
 
 class NonMetadataDocumentModel(DocumentBase):
     dataset_process_rule_id: str
-    dataset_process_rule: DatasetProcessRuleModel
-    document_process_rule: DocumentProcessRuleModel
+    dataset_process_rule: DatasetProcessRuleModel | None = None  # None for paginate_documents
+    document_process_rule: DocumentProcessRuleModel | None = None  # None for paginate_documents
     created_from: str
     created_by: str
     created_at: int
     tokens: int | None
-    completed_at: int | None
-    updated_at: int
-    indexing_latency: float | None
+    completed_at: int | None = None  # None for paginate_documents
+    updated_at: int | None = None  # None for paginate_documents
+    indexing_latency: float | None = None  # None for paginate_documents
     disabled_at: int | None
     disabled_by: str | None
     archived: bool
-    segment_count: int
-    average_segment_length: int
+    segment_count: int | None = None  # None for paginate_documents
+    average_segment_length: int | None = None  # None for paginate_documents
     hit_count: int
     display_status: str
     doc_form: str
-    doc_language: str | None
+    doc_language: str | None = None  # None for paginate_documents
     summary_index_status: str | None
     need_summary: bool
 
 
-class DocumentModel(NonMetadataDocumentModel, MetadataDocumentModel):...
+class DocumentModel(NonMetadataDocumentModel, MetadataDocumentModel): ...
+
 
 class ChunkDict(TypedDict):
     id: str

@@ -8,23 +8,23 @@ from urllib.parse import urlparse
 import requests
 
 from davidkhala.ai.agent.dify.api import API, Iterator
-from davidkhala.ai.agent.dify.api.knowledge.model import DatasetModel, DocumentModel
+from davidkhala.ai.agent.dify.api.knowledge.model import DatasetModel, NonMetadataDocumentModel
 
 
 class Dataset(API):
     def __init__(self, api_key: str, base_url="https://api.dify.ai/v1"):
         super().__init__(api_key, f"{base_url}/datasets")
 
-    def paginate_datasets(self, page=1, size=20):
+    def paginate_datasets(self, page=1, size=20, keyword=None):
         assert 0 < size < 101
-        r = self.request(self.base_url, "GET", params={
+        return self.request(self.base_url, "GET", params={
             'page': page,
             'limit': size,
+            'keyword': keyword
         })
-        return r
 
-    def list_datasets(self) -> Iterable[DatasetModel]:
-        for sub_list in Iterator(self.paginate_datasets, None):
+    def list_datasets(self, keyword=None) -> Iterable[DatasetModel]:
+        for sub_list in Iterator(self.paginate_datasets, keyword=keyword):
             for dataset in sub_list:
                 yield DatasetModel.model_validate(dataset)
 
@@ -69,16 +69,18 @@ class Dataset(API):
             r = self.on_response(r)
             return r['document']
 
-        def paginate_documents(self, page=1, size=20):
+        def paginate_documents(self, page=1, size=20, keyword=None):
+            assert 0 < size < 101
             return self.request(f"{self.base_url}/documents", "GET", params={
                 'page': page,
-                'limit': size
+                'limit': size,
+                'keyword': keyword
             })
 
-        def list_documents(self) -> Iterable[DocumentModel]:
-            for document_batch in Iterator(self.paginate_documents, None):
+        def list_documents(self, keyword=None) -> Iterable[NonMetadataDocumentModel]:
+            for document_batch in Iterator(self.paginate_documents, keyword=keyword):
                 for document in document_batch:
-                    yield DocumentModel(**document)
+                    yield NonMetadataDocumentModel.model_validate(document)
 
         def has_document(self, name) -> bool:
             return any(name == item['name'] for row in self.list_documents() for item in row)

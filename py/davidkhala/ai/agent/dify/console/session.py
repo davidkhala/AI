@@ -23,10 +23,12 @@ class ConsoleUser(API):
         self.options['headers']['x-csrf-token'] = self.session.cookies.get("csrf_token")
         return self.session.cookies
 
-    def set_tokens(self, *, csrf, access):
+    def set_tokens(self, *, csrf, access, refresh=None):
         """workaround for federated login"""
         self.session.cookies.set(name="__Host-csrf_token", value=csrf)
         self.session.cookies.set(name="__Host-access_token", value=access)
+        if refresh:
+            self.session.cookies.set(name="__Host-refresh_token", value=refresh)
 
 
         self.options['headers']['x-csrf-token'] = csrf

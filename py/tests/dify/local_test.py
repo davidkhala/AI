@@ -2,15 +2,16 @@ import json
 import os
 import unittest
 
-from davidkhala.ai.agent.dify.interface import IndexingError
-from davidkhala.ai.agent.dify.const import IndexingStatus
+from davidkhala.ai.agent.dify.console.knowledge.dataset import DocumentOperation
 from davidkhala.ai.agent.dify.console.knowledge.pipeline import Datasource, Pipeline
-from davidkhala.ai.agent.dify.console.knowledge.dataset import Operation
-from davidkhala.ai.agent.dify.console.session import ConsoleUser
-from davidkhala.ai.agent.dify.db.app import Studio
-from davidkhala.ai.agent.dify.db.knowledge import Dataset, Document, Pipeline
-from davidkhala.ai.agent.dify.db.sys import Info
 from davidkhala.ai.agent.dify.console.plugin import ConsolePlugin
+from davidkhala.ai.agent.dify.console.session import ConsoleUser
+from davidkhala.ai.agent.dify.const import IndexingStatus
+from davidkhala.ai.agent.dify.db.app import Studio
+from davidkhala.ai.agent.dify.db.knowledge import Dataset, Document, Pipeline as DBPipeline
+from davidkhala.ai.agent.dify.db.sys import Info
+from davidkhala.ai.agent.dify.interface import IndexingError
+
 
 class DBTest(unittest.TestCase):
     def setUp(self):
@@ -65,6 +66,8 @@ class ConsoleTest(unittest.TestCase):
         self.console = ConsoleUser()
         self.console.login("david-khala@hotmail.com", "davidkhala2025")
         self.connection_str = "postgresql://postgres:difyai123456@localhost:5432/dify"
+        dataset = "5be5a7b0-b725-40e7-a4e8-4ed953ef054e"
+        self.console_ops = DocumentOperation(self.console,dataset)
 
     def test_user(self):
         print(self.console.me)
@@ -72,39 +75,38 @@ class ConsoleTest(unittest.TestCase):
 
     def test_console_sync(self):
 
-        console_ops = Operation(self.console)
         doc_source = 'Home - Technological and Higher Education Institute of Hong Kong'
-        dataset = "5be5a7b0-b725-40e7-a4e8-4ed953ef054e"
+
         db_doc = Document(self.connection_str)
         ids = db_doc.id_by(doc_source)
         assert len(ids) == 1
         document = ids[0]
         with self.assertRaisesRegex(IndexingError, 'no website import info found'):
-            console_ops.website_sync(dataset, document)
+            self.console_ops.website_sync(document)
 
     def test_console_rerun(self):
-        console_ops = Operation(self.console)
+
         doc_source = 'Home - Technological and Higher Education Institute of Hong Kong'
         dataset = "5be5a7b0-b725-40e7-a4e8-4ed953ef054e"
         db_doc = Document(self.connection_str)
         ids = db_doc.id_by(doc_source)
 
-        returns = console_ops.rerun(dataset, *ids)
+        returns = self.console_ops.rerun(dataset, *ids)
         print(returns)
 
     def test_pipeline(self):
-        db_pipe = Pipeline(self.connection_str)
+        db_pipe = DBPipeline(self.connection_str)
         pipelines = db_pipe.pipelines
         for p in pipelines:
             for source in p['graph'].datasources:
                 print(source.datasource_type)
 
     def test_console_pipeline(self):
-        db_pipe = Pipeline(self.connection_str)
+        db_pipe = DBPipeline(self.connection_str)
         pipelines = db_pipe.pipelines
         db_ds = Dataset(self.connection_str)
         kb = Datasource(self.console)
-        console_ops = Operation(self.console)
+
         ids = db_ds.credential_id_by("public", "firecrawl")
         credential_id = str(ids[0])
         self.assertEqual(len(pipelines), 1)
@@ -132,9 +134,10 @@ class ConsoleTest(unittest.TestCase):
         run_r = load.async_run(p_id, node, inputs={
             'child_length': 512
         }, datasource_info_list=datasource_info_list)
+        console_ops = DocumentOperation(self.console, run_r.dataset.id)
         # wait until
         for document in run_r.documents:
-            final = console_ops.wait_until(run_r.dataset.id, document.id,
+            final = console_ops.wait_until(document.id,
                                            from_status=[IndexingStatus.WAITING, IndexingStatus.PARSING,
                                                         IndexingStatus.COMPLETED, IndexingStatus.FAILED])
             print(final)

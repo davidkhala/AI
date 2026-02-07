@@ -14,14 +14,15 @@ class Iterator(Iterable):
     def __iter__(self):
         return self
 
-    def __init__(self, get_fn: Callable[[int, int], Any], r: dict|None):
-        self.response = r
+    def __init__(self, get_fn: Callable[[int, int, str], Any], *, size=20, keyword=None):
+        self.last_response = None
+        self.keyword = keyword
+        self.size = size
         self.fn = get_fn
 
     def __next__(self):
-        if self.response and not self.response['has_more']:
+        if self.last_response and not self.last_response['has_more']:
             raise StopIteration
-        page = 1 if not self.response else self.response['page'] + 1
-        limit = None if not self.response else self.response['limit']
-        self.response = self.fn(page, limit)
-        return self.response['data']
+        page = 1 if not self.last_response else self.last_response['page'] + 1
+        self.last_response = self.fn(page, self.size, self.keyword)
+        return self.last_response['data']

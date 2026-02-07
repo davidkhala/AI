@@ -5,7 +5,7 @@ from davidkhala.ai.agent.dify.model import ID
 class Document(ID):
     position: int
     data_source_type: str
-    data_source_info: dict[str, str]
+    data_source_info: dict[str, str|int]
     name: str
     indexing_status: IndexingStatus
     error: str | None
