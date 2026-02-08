@@ -1,9 +1,10 @@
 from typing import Protocol, Any
 
-
-class ClientProtocol(Protocol):
-    api_key: str
+class RequestProtocol(Protocol):
     base_url: str
+
+class ClientProtocol(RequestProtocol):
+    api_key: str
 
 
 class ModelAware:

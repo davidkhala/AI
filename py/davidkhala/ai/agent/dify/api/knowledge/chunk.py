@@ -1,11 +1,9 @@
-from __future__ import annotations
-
 from davidkhala.ai.agent.dify.api import API
-from davidkhala.ai.agent.dify.api.knowledge.model import DocumentModel
+from davidkhala.ai.agent.dify.api.knowledge.document import Document
 
 
 class Chunk(API):
-    def __init__(self, d: DocumentModel, segment_id: str):
+    def __init__(self, d: Document, segment_id: str):
         super().__init__(d.api_key, f"{d.base_url}/segments/{segment_id}")
 
     def get(self):

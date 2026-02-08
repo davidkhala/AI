@@ -1,5 +1,3 @@
-from enum import Enum
-
 from davidkhala.utils.http_request import Request
 
 

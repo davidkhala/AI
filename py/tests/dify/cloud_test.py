@@ -6,9 +6,10 @@ from davidkhala.utils.syntax.path import resolve
 from requests import HTTPError
 
 from davidkhala.ai.agent.dify.api.app import Feedbacks, Conversation
-from davidkhala.ai.agent.dify.api.knowledge.dataset import Dataset
 from davidkhala.ai.agent.dify.api.knowledge.chunk import Chunk
+from davidkhala.ai.agent.dify.api.knowledge.dataset import Dataset
 from davidkhala.ai.agent.dify.api.knowledge.document import Document
+from davidkhala.ai.agent.dify.api.knowledge.metadata import Metadata
 
 
 class CloudTest(unittest.TestCase):
@@ -82,6 +83,7 @@ class DocumentTest(CloudTest):
         it = doc.get('all')
 
         print(it.custom_metadata)
+
     def test_list(self):
         for doc in self.client.list_documents():
             # doc has content, can be lengthy
@@ -150,6 +152,47 @@ class ChatAppTest(unittest.TestCase):
         r = c.bot_chat("What are the specs of the iPhone 13 Pro Max?")
         print(r)
 
+
+class MetadataTest(CloudTest):
+    def setUp(self):
+        super().setUp()
+        dataset_id = '8bae26cb-a2be-4487-8492-04554a4f7b8b'
+        client = Dataset.Instance(Dataset(self.api_key), dataset_id)
+        self.m = Metadata(client)
+
+    def test_list_dataset_metadata(self):
+        print(self.m.list())
+        id = 'f56f6184-ae86-469c-b132-5402b64dd0c9'
+        r = self.m.rename(id, 'intStr')
+        print(r)
+        r = self.m.rename(id, 'int')
+        print(r)
+
+    def test_document_metadata_get(self):
+        doc_id = 'e97a986b-9613-4f09-a8b2-d069f94bd1f9'
+        r = self.m.of_document(doc_id)
+        print(r)
+
+    def test_set_metadata(self):
+
+        documents = [
+            'e97a986b-9613-4f09-a8b2-d069f94bd1f9',
+            "d30300cf-a11c-4018-8b3c-07820bec11c0",
+            "38eb6e0c-ca99-40f9-a3d0-96890ef3d16b",
+            "4e1738a6-0a8c-4953-9c72-135139302665",
+            "704c0765-d524-4817-8cf3-5a8366c38907"
+        ]  # master
+        metadata = {
+            'level': 'postgraduate'
+        }
+        self.m.set(*documents, metadata=metadata)
+        # ensure
+        for doc_id in documents:
+            r = self.m.of_document(doc_id)
+            metadata_r = r.custom_metadata
+            assert len(metadata_r) == 1
+
+            self.assertDictEqual(metadata_r[0], metadata)
 
 if __name__ == '__main__':
     unittest.main()
