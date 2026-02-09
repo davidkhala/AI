@@ -1,0 +1,17 @@
+name: openai.yml
+on: push
+
+jobs:
+  py:
+    runs-on: ubuntu-latest
+    environment: openai
+    env:
+      API_KEY: ${{secrets.API_KEY}}
+    steps:
+      - uses: actions/checkout@main
+      - uses: davidkhala/uv-buildpack@main
+        with:
+          working-directory: py
+          test-entry-point: pytest openai_test.py
+          tests: py/tests
+          extras: azure

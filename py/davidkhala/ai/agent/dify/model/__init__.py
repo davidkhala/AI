@@ -1,7 +1,5 @@
-from pydantic import BaseModel
+from davidkhala.utils.dantic.models import ID
 
-class ID(BaseModel):
-    id: str
 
 class User(ID):
     name: str

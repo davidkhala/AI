@@ -79,16 +79,15 @@ class Conversation(API):
             'thought': [],
         }
         answers = []
-        for line in response.iter_lines():
-            if line and line != b'event: ping':
-                data = json.loads(line[5:].decode())
-                match data['event']:
-                    case 'agent_thought':
-                        r['thought'].append(data['thought'])
-                    case 'message_end':
-                        r['metadata'] = data['metadata']
-                    case 'agent_message':
-                        answers.append(data['answer'])
+        for data in as_sse(response):
+            match data['event']:
+                case 'agent_thought':
+                    r['thought'].append(data['thought'])
+                case 'message_end':
+                    r['metadata'] = data['metadata']
+                case 'agent_message':
+                    answers.append(data['answer'])
+
         r['answer'] = ''.join(answers)
         return r
 

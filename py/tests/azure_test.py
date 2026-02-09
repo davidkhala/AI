@@ -11,7 +11,7 @@ class OpenAITestCase(unittest.TestCase):
         self.client = OpenAIClient(api_key, project)
 
     def test_connect(self):
-        self.client.connect()
+        self.assertTrue(self.client.connect())
 
     def test_chat(self):
         self.client.as_chat()
@@ -25,7 +25,7 @@ class ModelDeploymentTestCase(unittest.TestCase):
         self.client = ModelDeploymentClient(key, deployment)
 
     def test_connect(self):
-        self.client.connect()
+        self.assertTrue(self.client.connect())
 
     def test_chat(self):
         self.client.as_chat("gpt-4o", "You are a helpful assistant.")
@@ -48,8 +48,11 @@ class ModelDeploymentTestCase(unittest.TestCase):
             'Gender': FieldProperties(required=True),
             'Credits Earned': FieldProperties(),
         }
-        self.client.as_chat("gpt-4o", "You are a professional OCR parser. Produce the output strictly according to the JSON schema")
+        self.client.as_chat("gpt-4o",
+                            "You are a professional OCR parser. Produce the output strictly according to the JSON schema")
         r = self.client.process(file, schema)
         print(r)
+
+
 if __name__ == '__main__':
     unittest.main()

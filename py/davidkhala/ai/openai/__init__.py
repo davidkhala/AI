@@ -1,10 +1,11 @@
 from typing import Literal
 
-from openai import OpenAI
+from openai import OpenAI, AuthenticationError, PermissionDeniedError
+from openai.types import Model
 
 from davidkhala.ai.model import SDKProtocol, Connectable
-from davidkhala.ai.model.embed import EmbeddingAware
 from davidkhala.ai.model.chat import on_response, ChatAware
+from davidkhala.ai.model.embed import EmbeddingAware
 from davidkhala.ai.model.garden import GardenAlike
 
 
@@ -16,14 +17,13 @@ class Client(ChatAware, EmbeddingAware, SDKProtocol, GardenAlike, Connectable):
 
     def connect(self):
         try:
-            type(self).models.fget(self)
+            self.list_models()
             return True
-        except:  # TODO make specific
+        except AuthenticationError| PermissionDeniedError:
             return False
 
-    @property
-    def models(self):
-        return self.client.models.list()
+    def list_models(self) -> list[Model]:
+        return self.client.models.list().data
 
     def encode(self, *_input: str) -> list[list[float]]:
         response = self.client.embeddings.create(

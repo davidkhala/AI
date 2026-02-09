@@ -32,10 +32,6 @@ class Client(CompareChatAware, Connectable, SDKProtocol, GardenAlike):
     def list_models(self) -> list[Model]:
         return self.client.models.list().data
 
-    @property
-    def models(self) -> list[str]:
-        return [m.id for m in self.list_models()]
-
 
 class Admin:
     def __init__(self, provisioning_key: str):
