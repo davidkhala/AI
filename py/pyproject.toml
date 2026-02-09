@@ -20,7 +20,7 @@ openrouter = ["openrouter"]
 ali = ["dashscope", "wuying-agentbay-sdk", "davidkhala.utils"]
 azure = ["openai", "davidkhala.utils", "davidkhala-ml-ocr"]
 telemetry = [
-    "opik ; python_version < '3.14'" # limit py version:　PyO3 v0.22.6 currently supports up to Python 3.13.
+    "opik ; python_version < '3.14'" # limit py version: PyO3 v0.22.6 currently supports up to Python 3.13.
 ]
 dify = ["dify-plugin", "davidkhala.utils[http_request]", "davidkhala.databases[pg]"]
 atlas = ["voyageai"]
