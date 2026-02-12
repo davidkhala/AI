@@ -22,7 +22,7 @@ class Client:
 
     def scrape(self, *urls: str) -> list[str]:
         """
-        :return the content of the web pages as Markdown format (incl. metadata)
+        :return: the content of the web pages as Markdown format (incl. metadata)
         """
         res = self.client.contents.generate(
             urls=list(urls),
