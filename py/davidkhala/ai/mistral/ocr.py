@@ -1,8 +1,8 @@
-import base64
 import json
 from pathlib import Path
 
 from davidkhala.ml.ocr.interface import FieldProperties as BaseFieldProperties
+from davidkhala.utils.syntax.format import Base64
 from mistralai import ImageURLChunk, ResponseFormat, JSONSchema
 
 from davidkhala.ai.mistral import Client as MistralClient
@@ -13,12 +13,11 @@ class FieldProperties(BaseFieldProperties):
 
 
 class Client(MistralClient):
-    def process(self, file: Path, schema: dict[str, FieldProperties] = None) -> list[dict]|dict:
+    def process(self, file: Path, schema: dict[str, FieldProperties] = None) -> list[dict] | dict:
         """
         Allowed formats are JPEG, PNG, WEBP, GIF, MPO, HEIF, AVIF, BMP, TIFF
         """
-        with open(file, "rb") as f:
-            content = base64.b64encode(f.read()).decode('utf-8')
+
         options = {}
         if schema:
             required = [k for k, _ in schema.items() if _.required]
@@ -37,7 +36,7 @@ class Client(MistralClient):
 
         ocr_response = self.client.ocr.process(
             model="mistral-ocr-latest",
-            document=ImageURLChunk(image_url=f"data:image/jpeg;base64,{content}"),
+            document=ImageURLChunk(image_url=f"data:image/jpeg;base64,{Base64.encode_file(file)}"),
             include_image_base64=True,
             **options,
         )
