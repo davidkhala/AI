@@ -29,13 +29,13 @@ class DBTest(unittest.TestCase):
         print(self.app.get_dict(Studio.user_feedbacks_sql))
 
     def test_generate_conversation_opener(self):
-        from davidkhala.ai.openrouter import Client
+        from davidkhala.llm.api.openrouter import OpenRouter
         # config
         app_id = '4f3c212a-0dc8-4405-97ca-22914c79a21e'
         question_size = 3
         api_key = os.environ.get('OPENROUTER_API_KEY')
-        self.openrouter = Client(api_key)
-        self.openrouter.as_chat('minimax/minimax-m2')
+        self.openrouter = OpenRouter(api_key)
+        self.openrouter.as_chat('openrouter/free')
         config = self.app.app_config(app_id)
         self.assertIsNotNone(config)
         print('current suggested_questions', config.suggested_questions)
@@ -67,7 +67,7 @@ class ConsoleTest(unittest.TestCase):
         self.console.login("david-khala@hotmail.com", "davidkhala2025")
         self.connection_str = "postgresql://postgres:difyai123456@localhost:5432/dify"
         dataset = "5be5a7b0-b725-40e7-a4e8-4ed953ef054e"
-        self.console_ops = DocumentOperation(self.console,dataset)
+        self.console_ops = DocumentOperation(self.console, dataset)
 
     def test_user(self):
         print(self.console.me)
@@ -157,6 +157,7 @@ class ConsoleTest(unittest.TestCase):
         pluginManage = ConsolePlugin(self.console)
         r = pluginManage.plugins()
         print(r)
+
     def test_plugin_install(self):
         pluginManage = ConsolePlugin(self.console)
         from davidkhala.ai.agent.dify.plugins.popular import Node
@@ -165,6 +166,7 @@ class ConsoleTest(unittest.TestCase):
         pluginManage.uninstall_by(*Node.agent)
         current = pluginManage.get(*Node.agent)
         self.assertEqual(0, len(current))
+
 
 if __name__ == '__main__':
     if not os.getenv('CI'):

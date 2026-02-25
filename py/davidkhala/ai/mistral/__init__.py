@@ -4,6 +4,7 @@ from mistralai import Mistral
 class Client:
 
     def __init__(self, api_key: str):
+        super().__init__()
         self.api_key = api_key
         self.client = Mistral(api_key=api_key)
 

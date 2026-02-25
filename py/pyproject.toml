@@ -13,10 +13,10 @@ ragflow = ["ragflow-sdk"]
 google = ["google-genai", "google-adk"]
 api = ["davidkhala.utils[http_request]"]
 
-mistral = ["mistralai", "davidkhala-ml-ocr"]
+mistral = ["mistralai", "davidkhala-ml-ocr", 'davidkhala-ai-models']
 you = ['youdotcom']
 ali = ["dashscope", "wuying-agentbay-sdk", "davidkhala.utils"]
-azure = ["openai", "davidkhala.utils", "davidkhala-ml-ocr"]
+
 telemetry = [
     "opik ; python_version < '3.14'" # limit py version: PyO3 v0.22.6 currently supports up to Python 3.13.
 ]

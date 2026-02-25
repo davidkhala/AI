@@ -5,14 +5,14 @@ from pathlib import Path
 from mistralai import SDKError
 
 from davidkhala.ai.mistral.agent import Agents
-from davidkhala.ai.mistral.ai import Client
+from davidkhala.ai.mistral.llm import Client
 from davidkhala.ai.mistral.file import Client as FileClient
 from davidkhala.ai.mistral.ocr import Client as OCRClient, FieldProperties
 
 api_key = os.environ.get("API_KEY")
 
 
-class AITest(unittest.TestCase):
+class LLMTest(unittest.TestCase):
 
     def setUp(self):
         self.client = Client(api_key)

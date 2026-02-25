@@ -1,17 +1,13 @@
-# https://github.com/mistralai/client-python
-
+from davidkhala.llm.model.chat import ChatAware
+from davidkhala.llm.model.embed import EmbeddingAware
 from mistralai import ResponseFormat
 
 from davidkhala.ai.mistral import Client as MistralClient
-from davidkhala.ai.model.embed import EmbeddingAware
-from davidkhala.ai.model.chat import on_response, ChatAware
 
 
 class Client(ChatAware, EmbeddingAware, MistralClient):
     def __init__(self, api_key: str):
-        ChatAware.__init__(self)
-        MistralClient.__init__(self, api_key)
-
+        super().__init__(api_key=api_key)
 
     def as_chat(self, model="mistral-large-latest", sys_prompt: str = None):
         super().as_chat(model, sys_prompt)
