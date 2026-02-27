@@ -4,13 +4,13 @@ from typing import Iterable, Literal
 import requests
 
 from davidkhala.ai.agent.dify.api import API, Iterator
-from davidkhala.ai.agent.dify.api.knowledge.dataset import Dataset
+from davidkhala.ai.agent.dify.api.knowledge.dataset import Instance
 from davidkhala.ai.agent.dify.api.knowledge.model import ChunkDict, DocumentModel, MetadataDocumentModel, \
     NonMetadataDocumentModel
 
 
 class Document(API):
-    def __init__(self, d: Dataset.Instance, document_id: str):
+    def __init__(self, d: Instance, document_id: str):
         super().__init__(d.api_key, f"{d.base_url}/documents/{document_id}")
 
     def exist(self):

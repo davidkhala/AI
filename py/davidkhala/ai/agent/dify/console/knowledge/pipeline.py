@@ -101,11 +101,15 @@ class Datasource(ConsoleDerived):
 
         for data in as_sse(response):
             event = data['event']
-            if event == 'datasource_completed':
-                return data['data']
-            else:
-                assert event == 'datasource_processing'
-                print(data)
+            match event:
+                case 'datasource_completed':
+                    return data['data']
+                case 'datasource_processing':
+                    print(data)
+                case 'datasource_error':
+                    raise Exception(data['error'])
+
+
         return None
 
     def upload(self):

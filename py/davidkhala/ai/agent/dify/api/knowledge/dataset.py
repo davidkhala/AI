@@ -9,6 +9,7 @@ import requests
 
 from davidkhala.ai.agent.dify.api import API, Iterator
 from davidkhala.ai.agent.dify.api.knowledge.model import DatasetModel, NonMetadataDocumentModel
+from davidkhala.ai.agent.dify.model.workflow import NodeProtocol
 
 
 class Dataset(API):
@@ -33,54 +34,67 @@ class Dataset(API):
         for dataset in self.list_datasets():
             yield dataset.id
 
-    class Instance(API):
-        def __init__(self, d: Dataset, dataset_id: str):
-            super().__init__(d.api_key, f"{d.base_url}/{dataset_id}")
 
-        def get(self) -> DatasetModel:
-            d = self.request(self.base_url, "GET")
-            return DatasetModel.model_validate(d)
+class Instance(API):
+    def __init__(self, d: Dataset, dataset_id: str):
+        super().__init__(d.api_key, f"{d.base_url}/{dataset_id}")
 
-        def upload(self, filename, *, path=None, url=None, document_id=None):
-            """
-            don't work for .html
-            work for .md
-            """
-            files = {}
-            if path:
-                with open(path, 'rb') as f:
-                    content = f.read()
-                if not filename:
-                    filename = os.path.basename(path)
-            elif url:
-                r = requests.get(url)
-                r.raise_for_status()
-                if not filename:
-                    parsed_url = urlparse(url)
-                    filename = Path(parsed_url.path).name
-                content = r.content
-            files['file'] = (filename, content)
-            if document_id:
-                # don't work for html
-                r = requests.post(f"{self.base_url}/documents/{document_id}/update-by-file", files=files,
-                                  **self.options)
-            else:
-                r = requests.post(f"{self.base_url}/document/create-by-file", files=files, **self.options)
-            r = self.on_response(r)
-            return r['document']
+    def get(self) -> DatasetModel:
+        d = self.request(self.base_url, "GET")
+        return DatasetModel.model_validate(d)
 
-        def paginate_documents(self, page=1, size=20, keyword=None):
-            assert 0 < size < 101
-            return self.request(f"{self.base_url}/documents", "GET", params={
-                'page': page,
-                'limit': size,
-                'keyword': keyword
-            })
+    def run(self, node: NodeProtocol, inputs:dict, datasource_info_list: list[dict]):
+        # TODO to be validated
+        # https://github.com/langgenius/dify/issues/30091
+        return self.request(f"{self.base_url}/pipeline/run",'POST', json={
+            "inputs": inputs,
+            "datasource_type": node.datasource_type,
+            "datasource_info_list": [{"info_key": "info_value"}],
+            "start_node_id": node.id,
+            "is_published": True,
+            "response_mode": "blocking"
+        })
 
-        def list_documents(self, keyword=None) -> Iterable[NonMetadataDocumentModel]:
-            for document_batch in Iterator(self.paginate_documents, keyword=keyword):
-                for document in document_batch:
-                    yield NonMetadataDocumentModel.model_validate(document)
+    def upload(self, filename, *, path=None, url=None, document_id=None):
+        """
+        don't work for .html
+        work for .md
+        """
+        files = {}
+        if path:
+            with open(path, 'rb') as f:
+                content = f.read()
+            if not filename:
+                filename = os.path.basename(path)
+        elif url:
+            r = requests.get(url)
+            r.raise_for_status()
+            if not filename:
+                parsed_url = urlparse(url)
+                filename = Path(parsed_url.path).name
+            content = r.content
+        files['file'] = (filename, content)
+        if document_id:
+            # don't work for html
+            r = requests.post(f"{self.base_url}/documents/{document_id}/update-by-file", files=files,
+                              **self.options)
+        else:
+            r = requests.post(f"{self.base_url}/document/create-by-file", files=files, **self.options)
+        r = self.on_response(r)
+        return r['document']
 
-        def has_document(self, name) -> bool:
-            return any(name == item['name'] for row in self.list_documents() for item in row)
+    def paginate_documents(self, page=1, size=20, keyword=None):
+        assert 0 < size < 101
+        return self.request(f"{self.base_url}/documents", "GET", params={
+            'page': page,
+            'limit': size,
+            'keyword': keyword
+        })
+
+    def list_documents(self, keyword=None) -> Iterable[NonMetadataDocumentModel]:
+        for document_batch in Iterator(self.paginate_documents, keyword=keyword):
+            for document in document_batch:
+                yield NonMetadataDocumentModel.model_validate(document)
+
+    def has_document(self, name) -> bool:
+        return any(name == item['name'] for row in self.list_documents() for item in row)

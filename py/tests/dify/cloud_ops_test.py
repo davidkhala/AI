@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from davidkhala.ai.agent.dify.api.knowledge.dataset import Dataset
+from davidkhala.ai.agent.dify.api.knowledge.dataset import Dataset, Instance
 from davidkhala.ai.agent.dify.api.knowledge.document import Document
 from davidkhala.ai.agent.dify.console.knowledge.dataset import DocumentOperation, DocumentMetadata
 from davidkhala.ai.agent.dify.const import IndexingStatus
@@ -32,8 +32,8 @@ class ConsoleTestCase(unittest.TestCase):
         self.console = ConsoleUser(base_url='https://cloud.dify.ai')
 
         self.console.set_tokens(
-            csrf='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzA0NzAwNTMsInN1YiI6IjQ1YmRjODY1LTZkNzEtNDBhYi04ODkyLWFmNTM5MDYzNjJmYSJ9.s5sn-lBIuNwv1d0tyT3Hoi5UuQzAwhuS8fHvPwIflxo',
-            access='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNDViZGM4NjUtNmQ3MS00MGFiLTg4OTItYWY1MzkwNjM2MmZhIiwiZXhwIjoxNzcwNDcwMDUzLCJpc3MiOiJDTE9VRCIsInN1YiI6IkNvbnNvbGUgQVBJIFBhc3Nwb3J0In0.orO-HD8LIR6RRbSAh3JDuWVe8JZEUf2cd-yuKDKbai0',
+            csrf='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzIxODE5NTIsInN1YiI6IjQ1YmRjODY1LTZkNzEtNDBhYi04ODkyLWFmNTM5MDYzNjJmYSJ9.0la4FGs6AvHIMSbLSpww-5PyyWY3WygGb0MsYpCNeDE',
+            access='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNDViZGM4NjUtNmQ3MS00MGFiLTg4OTItYWY1MzkwNjM2MmZhIiwiZXhwIjoxNzcyMTgxOTUyLCJpc3MiOiJDTE9VRCIsInN1YiI6IkNvbnNvbGUgQVBJIFBhc3Nwb3J0In0.W-ydAtVaKv-Vj_4ovFIY2YzrwcXdkDASFEQsywsjsCA',
         )
         self.metadata = DocumentMetadata(self.console, '8bae26cb-a2be-4487-8492-04554a4f7b8b') # Thei one details
 
@@ -55,7 +55,7 @@ class ConsoleTestCase(unittest.TestCase):
         }
         self.metadata.set(*documents, metadata=metadata)
         # ensure
-        self.client = Dataset.Instance(Dataset(self.api_key), self.metadata.dataset)
+        self.client = Instance(Dataset(self.api_key), self.metadata.dataset)
         for doc_id in documents:
             doc = Document(self.client, doc_id)
             metadata_r = doc.get('only').custom_metadata
@@ -63,31 +63,30 @@ class ConsoleTestCase(unittest.TestCase):
 
             self.assertDictEqual(metadata_r[0], metadata)
 
-
     def test_pipeline_dev(self):
         # TODO do a cloud version
-        dataset_id = '8bae26cb-a2be-4487-8492-04554a4f7b8b'
-        from davidkhala.ai.agent.dify.api.knowledge.dataset import Dataset
+
+        # pre-requisite: prepare cookie and api_key first
+        dataset_id = '34a72f60-c9ab-4067-abc1-34cb951e7239'
+        firecrawl_key_name = 'davidkhala'
+        from davidkhala.ai.agent.dify.api.knowledge.dataset import Dataset, Instance
 
         from davidkhala.ai.agent.dify.console.knowledge.pipeline import Datasource, Pipeline
         from davidkhala.ai.agent.dify.console.plugin import ConsoleTool
 
-        ds = Dataset.Instance(Dataset(self.api_key), dataset_id)
+        ds = Instance(Dataset(self.api_key), dataset_id)
         p_id = ds.get().pipeline_id
 
         kb_console = Datasource(self.console)
 
         console_tool = ConsoleTool(self.console)
         console_pipeline = Pipeline(self.console)
-        credential_id = console_tool.credential_id_by('key', 'langgenius', "firecrawl")
+        credential_id = console_tool.credential_id_by(firecrawl_key_name, 'langgenius', "firecrawl")
 
         pipeline = console_pipeline.get(p_id)
         nodes = pipeline.graph.datasources
-        node: NodeProtocol | None = None
-        for _ in nodes:
-            if _.data.title == 'Firecrawl':
-                node = _
-                break
+        node = next((n for n in nodes if n.data.title == 'Firecrawl'), None)
+
         pages = 1
         sources_r = kb_console.run_firecrawl(p_id, node, inputs={
             "url": "https://thei.edu.hk/",
@@ -105,8 +104,7 @@ class ConsoleTestCase(unittest.TestCase):
             Console.model_validate(source)  # schema validation
             datasource_info_list.append(source)
 
-        run_r = pipeline.async_run(p_id, node, inputs={
-            'child_length': 512
+        run_r = console_pipeline.async_run(p_id, node, inputs={
         }, datasource_info_list=datasource_info_list)
         # wait until
         assert len(run_r.documents) == pages
