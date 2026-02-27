@@ -32,10 +32,10 @@ class ConsoleTestCase(unittest.TestCase):
         self.console = ConsoleUser(base_url='https://cloud.dify.ai')
 
         self.console.set_tokens(
-            csrf='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzIxODE5NTIsInN1YiI6IjQ1YmRjODY1LTZkNzEtNDBhYi04ODkyLWFmNTM5MDYzNjJmYSJ9.0la4FGs6AvHIMSbLSpww-5PyyWY3WygGb0MsYpCNeDE',
-            access='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNDViZGM4NjUtNmQ3MS00MGFiLTg4OTItYWY1MzkwNjM2MmZhIiwiZXhwIjoxNzcyMTgxOTUyLCJpc3MiOiJDTE9VRCIsInN1YiI6IkNvbnNvbGUgQVBJIFBhc3Nwb3J0In0.W-ydAtVaKv-Vj_4ovFIY2YzrwcXdkDASFEQsywsjsCA',
+            csrf='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzIxODM4NTgsInN1YiI6IjQ1YmRjODY1LTZkNzEtNDBhYi04ODkyLWFmNTM5MDYzNjJmYSJ9.cwUimkmvvBURScpPFCb3hvtBl_UckemJy3w1oV-AIS0',
+            access='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNDViZGM4NjUtNmQ3MS00MGFiLTg4OTItYWY1MzkwNjM2MmZhIiwiZXhwIjoxNzcyMTgzODU4LCJpc3MiOiJDTE9VRCIsInN1YiI6IkNvbnNvbGUgQVBJIFBhc3Nwb3J0In0.hLU5WO8aF6uSYpopfLkT3Jy-hilaSzCBTBT9Ik0x1xA',
         )
-        self.metadata = DocumentMetadata(self.console, '8bae26cb-a2be-4487-8492-04554a4f7b8b') # Thei one details
+        self.metadata = DocumentMetadata(self.console, '8bae26cb-a2be-4487-8492-04554a4f7b8b')  # Thei one details
 
     def test_list_metadata(self):
         r = self.metadata.list()
@@ -63,12 +63,13 @@ class ConsoleTestCase(unittest.TestCase):
 
             self.assertDictEqual(metadata_r[0], metadata)
 
-    def test_pipeline_dev(self):
-        # TODO do a cloud version
-
+    def test_pipeline(self):
         # pre-requisite: prepare cookie and api_key first
         dataset_id = '34a72f60-c9ab-4067-abc1-34cb951e7239'
-        firecrawl_key_name = 'davidkhala'
+        firecrawl_key_name = 'key'
+        self.pipeline(dataset_id, firecrawl_key_name)
+
+    def pipeline(self, dataset_id, firecrawl_key_name, skip_firecrawl_datasource=True):
         from davidkhala.ai.agent.dify.api.knowledge.dataset import Dataset, Instance
 
         from davidkhala.ai.agent.dify.console.knowledge.pipeline import Datasource, Pipeline
@@ -82,28 +83,39 @@ class ConsoleTestCase(unittest.TestCase):
         console_tool = ConsoleTool(self.console)
         console_pipeline = Pipeline(self.console)
         credential_id = console_tool.credential_id_by(firecrawl_key_name, 'langgenius', "firecrawl")
-
+        self.assertIsNotNone(credential_id)
         pipeline = console_pipeline.get(p_id)
         nodes = pipeline.graph.datasources
         node = next((n for n in nodes if n.data.title == 'Firecrawl'), None)
 
         pages = 1
-        sources_r = kb_console.run_firecrawl(p_id, node, inputs={
-            "url": "https://thei.edu.hk/",
-            "subpage": False,
-            "pages": pages
-        }, credential_id=credential_id)
-
-        print('--run_firecrawl completed')
-        from davidkhala.ai.agent.dify.plugins.firecrawl import Console
 
         datasource_info_list = []
-        for source in sources_r:
-            source['credential_id'] = credential_id
-            source['title'] = source['source_url']
-            Console.model_validate(source)  # schema validation
-            datasource_info_list.append(source)
+        from davidkhala.ai.agent.dify.plugins.firecrawl import Console as FirecrawlModel
+        url = "https://thei.edu.hk/"
+        if not skip_firecrawl_datasource:
+            sources_r = kb_console.run_firecrawl(p_id, node, inputs={
+                "url": url,
+                "subpage": False,
+                "pages": pages
+            }, credential_id=credential_id)
 
+            print('--run_firecrawl completed')
+
+            datasource_info_list = []
+            for source in sources_r:
+                source['credential_id'] = credential_id
+                source['title'] = source['source_url']
+                FirecrawlModel.model_validate(source)  # schema validation
+                datasource_info_list.append(source)
+            assert len(datasource_info_list) == pages
+        else:
+            f = {
+                'title': url,
+                'credential_id': credential_id,
+                'source_url': url
+            }
+            datasource_info_list.append(f)
         run_r = console_pipeline.async_run(p_id, node, inputs={
         }, datasource_info_list=datasource_info_list)
         # wait until

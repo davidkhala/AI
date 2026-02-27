@@ -43,18 +43,6 @@ class Instance(API):
         d = self.request(self.base_url, "GET")
         return DatasetModel.model_validate(d)
 
-    def run(self, node: NodeProtocol, inputs:dict, datasource_info_list: list[dict]):
-        # TODO to be validated
-        # https://github.com/langgenius/dify/issues/30091
-        return self.request(f"{self.base_url}/pipeline/run",'POST', json={
-            "inputs": inputs,
-            "datasource_type": node.datasource_type,
-            "datasource_info_list": [{"info_key": "info_value"}],
-            "start_node_id": node.id,
-            "is_published": True,
-            "response_mode": "blocking"
-        })
-
     def upload(self, filename, *, path=None, url=None, document_id=None):
         """
         don't work for .html
