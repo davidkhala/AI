@@ -1,13 +1,13 @@
+from abc import ABC
 from datetime import datetime
 
 from davidkhala.utils.http_request import Request
 
 from davidkhala.ai.agent.dify.api.knowledge.model import MetadataType, DocMetadataModel
-from davidkhala.ai.model import RequestProtocol
 
 
-class DocumentMetadataProtocol(Request, RequestProtocol):
-
+class DocumentMetadataProtocol(Request, ABC):
+    base_url:str
     def list(self) -> list[DocMetadataModel]:
         r = self.request(f"{self.base_url}/metadata", "GET")
         return [DocMetadataModel.model_validate(_) for _ in r['doc_metadata']]

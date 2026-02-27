@@ -1,5 +1,5 @@
-from davidkhala.ai.agent.dify.ops.db import DB
-from davidkhala.ai.agent.dify.ops.db.orm import Graph
+from davidkhala.ai.agent.dify.db import DB
+from davidkhala.ai.agent.dify.db.orm import Graph
 
 
 class Dataset(DB):

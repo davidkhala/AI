@@ -34,5 +34,5 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
-    "pytest"
+    "pytest", 'davidkhala-ai-models'
 ]

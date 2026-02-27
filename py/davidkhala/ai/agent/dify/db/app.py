@@ -1,16 +1,17 @@
-from davidkhala.ai.agent.dify.ops.db import DB
-from davidkhala.ai.agent.dify.ops.db.orm import AppModelConfig
+from davidkhala.ai.agent.dify.db import DB
+from davidkhala.ai.agent.dify.db.orm import AppModelConfig
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 
+
 class Studio(DB):
     user_feedbacks_sql = """SELECT mf.conversation_id,
-                        mf.content,
-                        m.query,
-                        m.answer
-                 FROM message_feedbacks mf
-                          LEFT JOIN messages m ON mf.message_id = m.id
-                 WHERE mf.from_source = 'user'"""
+                                   mf.content,
+                                   m.query,
+                                   m.answer
+                            FROM message_feedbacks mf
+                                     LEFT JOIN messages m ON mf.message_id = m.id
+                            WHERE mf.from_source = 'user'"""
 
     @property
     def apps(self): return self.get_dict("select id, name, mode from apps where status = 'normal'")
@@ -32,3 +33,7 @@ class Studio(DB):
                 session.refresh(record)
                 return record
             return None
+
+    def messages(self, app_id):
+        sql = f"""SELECT conversation_id, query, answer FROM messages WHERE app_id = '{app_id}'"""
+        return self.get_dict(sql)

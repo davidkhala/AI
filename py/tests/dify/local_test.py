@@ -17,7 +17,6 @@ class DBTest(unittest.TestCase):
     def setUp(self):
         connection_str = "postgresql://postgres:difyai123456@localhost:5432/dify"
         self.app = Studio(connection_str)
-        self.ds = Dataset(connection_str)
         self.doc = Document(connection_str)
         self.info = Info(connection_str)
 
@@ -41,9 +40,9 @@ class DBTest(unittest.TestCase):
         print('current suggested_questions', config.suggested_questions)
         new_questions = []
         for d in self.doc.hit_documents(question_size):
-            dataset_id = d['dataset_id']
             content = d['content']
-            questions = self.ds.dataset_queries(dataset_id)
+
+            questions = [_['query'] for _ in self.app.messages(app_id)]
             prompt = f"""
             Based on below knowledge base document content, generate single question that user may ask against the content. 
             Don't assume user have document content as prior knowledge.
