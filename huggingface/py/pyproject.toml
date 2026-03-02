@@ -21,7 +21,7 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
-    "pytest"
+    "pytest", 'davidkhala-ai-models'
 ]
 download = ['onnxruntime', 'onnx']
 DeepSeek-OCR = ["torchvision", "addict", "einops", "easydict"]

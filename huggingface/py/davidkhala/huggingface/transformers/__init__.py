@@ -1,5 +1,5 @@
 from transformers import pipeline
-from davidkhala.ai.model.chat import MessageDict
+from davidkhala.llm.model.chat import MessageDict
 
 
 class Pipeline:

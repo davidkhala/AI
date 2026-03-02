@@ -105,7 +105,6 @@ class ConsoleTest(unittest.TestCase):
         db_pipe = DBPipeline(self.connection_str)
         pipelines = db_pipe.pipelines
         db_ds = Dataset(self.connection_str)
-        kb = Datasource(self.console)
 
         ids = db_ds.credential_id_by("public", "firecrawl")
         credential_id = str(ids[0])
@@ -114,25 +113,18 @@ class ConsoleTest(unittest.TestCase):
         nodes = p['graph'].datasources
         p_id = p['app_id']
         node = nodes[0]
+        url= "https://thei.edu.hk/"
 
-        sources_r = kb.run_firecrawl(p_id, node, inputs={
-            "url": "https://thei.edu.hk/",
-            "subpage": False,
-            "pages": 1
-        }, credential_id=credential_id)
         load = Pipeline(self.console)
-        print('--run_firecrawl completed')
-        from davidkhala.ai.agent.dify.plugins.firecrawl import Console
 
-        datasource_info_list = []
-        for source in sources_r:
-            source['credential_id'] = credential_id
-            source['title'] = source['source_url']
-            Console(**source)  # schema validation
-            datasource_info_list.append(source)
+        datasource_info_list = [{
+            'title': url,
+            'credential_id': credential_id,
+            'source_url': url
+        }]
+
 
         run_r = load.async_run(p_id, node, inputs={
-            'child_length': 512
         }, datasource_info_list=datasource_info_list)
         console_ops = DocumentOperation(self.console, run_r.dataset.id)
         # wait until

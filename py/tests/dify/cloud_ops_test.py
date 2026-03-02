@@ -32,8 +32,8 @@ class ConsoleTestCase(unittest.TestCase):
         self.console = ConsoleUser(base_url='https://cloud.dify.ai')
 
         self.console.set_tokens(
-            csrf='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzIxODM4NTgsInN1YiI6IjQ1YmRjODY1LTZkNzEtNDBhYi04ODkyLWFmNTM5MDYzNjJmYSJ9.cwUimkmvvBURScpPFCb3hvtBl_UckemJy3w1oV-AIS0',
-            access='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNDViZGM4NjUtNmQ3MS00MGFiLTg4OTItYWY1MzkwNjM2MmZhIiwiZXhwIjoxNzcyMTgzODU4LCJpc3MiOiJDTE9VRCIsInN1YiI6IkNvbnNvbGUgQVBJIFBhc3Nwb3J0In0.hLU5WO8aF6uSYpopfLkT3Jy-hilaSzCBTBT9Ik0x1xA',
+            csrf='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzI0NjE2MjcsInN1YiI6IjQ1YmRjODY1LTZkNzEtNDBhYi04ODkyLWFmNTM5MDYzNjJmYSJ9.pV0PY4MebZqcWWtGU4UqfuSdPi99vBtP1Mt5g6GOVZA',
+            access='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNDViZGM4NjUtNmQ3MS00MGFiLTg4OTItYWY1MzkwNjM2MmZhIiwiZXhwIjoxNzcyNDYxNjI3LCJpc3MiOiJDTE9VRCIsInN1YiI6IkNvbnNvbGUgQVBJIFBhc3Nwb3J0In0.keHWorgFW2b0bz8zhvxTheddmaCaVpbO-qYyIJVxdD4',
         )
         self.metadata = DocumentMetadata(self.console, '8bae26cb-a2be-4487-8492-04554a4f7b8b')  # Thei one details
 
@@ -67,65 +67,13 @@ class ConsoleTestCase(unittest.TestCase):
         # pre-requisite: prepare cookie and api_key first
         dataset_id = '34a72f60-c9ab-4067-abc1-34cb951e7239'
         firecrawl_key_name = 'key'
-        self.pipeline(dataset_id, firecrawl_key_name)
-
-    def pipeline(self, dataset_id, firecrawl_key_name, skip_firecrawl_datasource=True):
-        from davidkhala.ai.agent.dify.api.knowledge.dataset import Dataset, Instance
-
-        from davidkhala.ai.agent.dify.console.knowledge.pipeline import Datasource, Pipeline
-        from davidkhala.ai.agent.dify.console.plugin import ConsoleTool
-
-        ds = Instance(Dataset(self.api_key), dataset_id)
-        p_id = ds.get().pipeline_id
-
-        kb_console = Datasource(self.console)
-
-        console_tool = ConsoleTool(self.console)
+        from davidkhala.ai.agent.dify.console.knowledge.pipeline import Pipeline
         console_pipeline = Pipeline(self.console)
-        credential_id = console_tool.credential_id_by(firecrawl_key_name, 'langgenius', "firecrawl")
-        self.assertIsNotNone(credential_id)
-        pipeline = console_pipeline.get(p_id)
-        nodes = pipeline.graph.datasources
-        node = next((n for n in nodes if n.data.title == 'Firecrawl'), None)
-
-        pages = 1
-
-        datasource_info_list = []
-        from davidkhala.ai.agent.dify.plugins.firecrawl import Console as FirecrawlModel
         url = "https://thei.edu.hk/"
-        if not skip_firecrawl_datasource:
-            sources_r = kb_console.run_firecrawl(p_id, node, inputs={
-                "url": url,
-                "subpage": False,
-                "pages": pages
-            }, credential_id=credential_id)
+        ds = Instance(Dataset(self.api_key), dataset_id)
+        rs = console_pipeline.filecrawl(url, ds, firecrawl_key_name)
+        print(rs)
 
-            print('--run_firecrawl completed')
-
-            datasource_info_list = []
-            for source in sources_r:
-                source['credential_id'] = credential_id
-                source['title'] = source['source_url']
-                FirecrawlModel.model_validate(source)  # schema validation
-                datasource_info_list.append(source)
-            assert len(datasource_info_list) == pages
-        else:
-            f = {
-                'title': url,
-                'credential_id': credential_id,
-                'source_url': url
-            }
-            datasource_info_list.append(f)
-        run_r = console_pipeline.async_run(p_id, node, inputs={
-        }, datasource_info_list=datasource_info_list)
-        # wait until
-        assert len(run_r.documents) == pages
-        console_ops = DocumentOperation(self.console, run_r.dataset.id)
-        for document in run_r.documents:
-            final = console_ops.wait_until(document.id,
-                                           from_status=[IndexingStatus.WAITING, IndexingStatus.PARSING,
-                                                        IndexingStatus.COMPLETED, IndexingStatus.FAILED])
-            print(final)
 
 
 if __name__ == '__main__':

@@ -4,9 +4,8 @@ from http import HTTPStatus
 from dashscope.api_entities.dashscope_response import DashScopeAPIResponse
 
 from dashscope import Generation, TextEmbedding
-from davidkhala.ai.model import ClientProtocol
-from davidkhala.ai.model.embed import EmbeddingAware
-from davidkhala.ai.model.chat import MessageDict, ChatAware
+from davidkhala.llm.model.embed import EmbeddingAware
+from davidkhala.llm.model.chat import MessageDict, ChatAware
 
 
 class ModelEnum(str, Enum):
@@ -18,7 +17,7 @@ class ModelEnum(str, Enum):
     EMBED = TextEmbedding.Models.text_embedding_v4
 
 
-class API(ChatAware, EmbeddingAware, ClientProtocol):
+class API(ChatAware, EmbeddingAware):
     """
     Unsupported to use international base_url "https://dashscope-intl.aliyuncs.com"
     """

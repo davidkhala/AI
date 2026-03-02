@@ -2,7 +2,7 @@ import os
 import unittest
 
 from davidkhala.huggingface import Client
-
+from davidkhala.llm.model.chat import ImagePrompt
 
 class ClientTestCase(unittest.TestCase):
 
@@ -16,8 +16,8 @@ class ClientTestCase(unittest.TestCase):
     def qwenvl(self, text, url=None):
         self.client.as_chat("Qwen/Qwen3-VL-8B-Instruct")
         if url:
-            from davidkhala.ai.model.chat import ImagePromptDict
-            prompt = ImagePromptDict(
+
+            prompt = ImagePrompt(
                 text='Please validate if it is real. If it is too blur to be validated, reply uncertain',
                 image_url=[url])
             return self.client.chat(prompt)
