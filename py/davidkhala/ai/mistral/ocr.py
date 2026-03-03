@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from davidkhala.ml.ocr.interface import FieldProperties as BaseFieldProperties
+from davidkhala.ml.ocr.model import FieldProperties as BaseFieldProperties
 from davidkhala.utils.syntax.format import Base64
 from mistralai import ImageURLChunk, ResponseFormat, JSONSchema
 

@@ -50,3 +50,4 @@ jobs:
           tests: py/tests
           extras: ali
           version: ${{matrix.version}}
+          groups: ali

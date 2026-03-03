@@ -36,3 +36,6 @@ build-backend = "hatchling.build"
 dev = [
     "pytest", 'davidkhala-ai-models'
 ]
+ali = [
+    "playwright"
+]
