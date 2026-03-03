@@ -3,7 +3,6 @@ import unittest
 from unittest import skipIf
 
 from youdotcom.models import ComputeTool, ResearchTool
-from youdotcom.types.typesafe_models import SearchEffort, Verbosity
 
 from davidkhala.ai.you import Client
 
@@ -19,13 +18,14 @@ class ChatTestCase(unittest.TestCase):
 
     @skipIf(os.environ.get('CI'), "Research cost $15 / request")
     def test_agent(self):
+        from youdotcom.models import SearchEffort, ReportVerbosity
         response = self.you.chat(
-            "Research and calculate the latest trends and the square root of 169. Show your work.",
+            "calculate the square root of 169.",
             tools=[
                 ComputeTool(),
                 ResearchTool(
-                    search_effort=SearchEffort.AUTO,
-                    report_verbosity=Verbosity.HIGH,
+                    search_effort=SearchEffort.LOW,
+                    report_verbosity=ReportVerbosity.MEDIUM,
                 ),
             ]
         )

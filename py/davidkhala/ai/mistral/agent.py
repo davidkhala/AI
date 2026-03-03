@@ -3,7 +3,7 @@ from typing import Literal, Union
 from mistralai import Agent, ToolExecutionEntry, FunctionCallEntry, MessageOutputEntry, AgentHandoffEntry
 
 from davidkhala.ai.mistral import Client as MistralClient
-from davidkhala.ai.model.chat import messages_from
+from davidkhala.llm.model.chat import messages_from
 
 
 class Agents(MistralClient):
