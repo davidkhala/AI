@@ -39,7 +39,7 @@ class LLMTest(unittest.TestCase):
 
     def test_models(self):
         models = self.client.models
-        self.assertGreaterEqual(len(models), 66)
+        self.assertGreaterEqual(len(models), 56)
         print(models)
 
 

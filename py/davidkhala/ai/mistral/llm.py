@@ -1,11 +1,13 @@
-from davidkhala.llm.model.chat import ChatAware
+from davidkhala.llm.model.chat import ChoicesChat, on_response
 from davidkhala.llm.model.embed import EmbeddingAware
+from davidkhala.llm.model.garden import GardenAlike
+from davidkhala.utils.protocol import ID
 from mistralai import ResponseFormat
 
 from davidkhala.ai.mistral import Client as MistralClient
 
 
-class Client(ChatAware, EmbeddingAware, MistralClient):
+class Client(ChoicesChat, EmbeddingAware, MistralClient, GardenAlike):
     def __init__(self, api_key: str):
         super().__init__(api_key=api_key)
 
@@ -31,6 +33,5 @@ class Client(ChatAware, EmbeddingAware, MistralClient):
         )
         return [d.embedding for d in res.data]
 
-    @property
-    def models(self) -> list[str]:
-        return [_.id for _ in self.client.models.list().data]
+    def list_models(self) -> list[ID]:
+        return self.client.models.list().data
