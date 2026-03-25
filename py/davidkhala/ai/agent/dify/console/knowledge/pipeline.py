@@ -86,9 +86,9 @@ class Pipeline(ConsoleDerived):
 
         p_id = dataset_instance.get().pipeline_id
 
-        kb_console = Datasource(self.context)
+        kb_console = Datasource(self.user)
 
-        console_tool = ConsoleTool(self.context)
+        console_tool = ConsoleTool(self.user)
 
         credential_id = console_tool.credential_id_by(firecrawl_key_name, 'langgenius', "firecrawl")
         assert credential_id is not None
@@ -127,7 +127,7 @@ class Pipeline(ConsoleDerived):
         # wait until
         assert len(run_r.documents) == pages
 
-        console_ops = DocumentOperation(self.context, run_r.dataset.id)
+        console_ops = DocumentOperation(self.user, run_r.dataset.id)
         returns = []
         from davidkhala.ai.agent.dify.const import IndexingStatus
         for document in run_r.documents:

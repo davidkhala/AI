@@ -47,7 +47,7 @@ class ConsoleUser(API):
 class ConsoleDerived(API):
     def __init__(self, context: ConsoleUser):
         super().__init__()
-        self.context = context
+        self.user = context
         self.base_url = context.base_url
         self.session.cookies = context.session.cookies
         self.options = context.options
