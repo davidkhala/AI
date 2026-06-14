@@ -1,3 +1,4 @@
+> Anomaly's open-source coding agent -- ollama
 tags: code agent, MCP client, CLI, Desktop App
 
 [home](https://opencode.ai/)
