@@ -1,7 +1,7 @@
 [project]
 name = "davidkhala.ai"
 version = "0.2.3"
-description = "misc AI modules"
+description = "AI Studio"
 readme = "README.md"
 requires-python = ">=3.12"
 [project.optional-dependencies]
@@ -28,6 +28,5 @@ build-backend = "hatchling.build"
 dev = [
     "pytest", 'davidkhala-ai-models'
 ]
-ali = [
-    "playwright"
-]
+ali = ["playwright"]
+telemetry = ["google-genai", "google-adk"]
